@@ -1,0 +1,176 @@
+% article example for classicthesis.sty
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[francais]{babel}
+\usepackage[left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm]{geometry}
+\selectlanguage{french}
+%\usepackage{url}
+\usepackage{algorithm2e} %for psuedo code
+
+\begin{document}
+    \title{Projet 1 - MoSiMA : Marché du travail simplifié - Courbe de Beveridge}
+    \author{RIVOIRE Claire - OSTROWSKI Camille}
+    \date{Octobre - Novembre 2015} % no date
+    
+    \maketitle
+    \section{Modèle de base}
+    \subsection{Etudier le modèle de base proposé (sans tenir compte pour le moment de l'annexe A)}
+    \subsection{Quels sont les agents ? Leurs attributs ? Leurs comportements ?}
+    
+    Il y a 3 types d'agents :
+    \begin{itemize}
+    \item [-] Les agents de type \texttt{PERSON} : ils représentent les travailleurs. Ils peuvent être \emph{employed} ou \emph{unemployed} : ils peuvent au maximum avoir un \emph{job}.
+    \item [-] Les agents de type \texttt{COMPANY} : ils représentent les entités qui offrent des \emph{job}. Ils peuvent être \emph{vacant} ou \emph{filled}. Ils offrent au maximum un seul \emph{job}.
+    \item [-] L'agent de type \texttt{MATCHING} : il représente l'entité responsable de mettre en relation les agents \texttt{PERSON} avec les agents \texttt{COMPANY} (équivalent d'un pôle emploi qui gère tous les jobs).
+    \end{itemize}
+    
+    De plus, les agents de types \texttt{PERSON} et \texttt{COMPANY} possèdent tous les attributs suivants :
+    \begin{center}
+    \begin{tabular}{|c|c|c|c|}
+    \hline Nom & type &  comparaison &  Correspondance  \\
+    \hline Skills & tableau de 5 booléens & nombre de valeurs égales & compétences possédées/requises \\
+    \hline Location & valeur discrète & égalité & Lieu du \emph{job}/du travailleur \\
+    \hline salaire & entier & différence & salaire minimum voulu/salaire net proposé \\
+    \hline
+    \end{tabular}
+    \end{center}
+    
+    La valeur de similarité entre les \emph{skills} requises et possédés est ensuite normalisée entre 0 et 1 (1 indiquant une compatibilité parfaite). \\
+    
+    Le comportement des agents est le suivant :
+    Les agents \texttt{PERSON} qui ne sont pas \emph{employed} et \texttt{COMPANY} qui ont un \emph{vacant job} envoient leurs demandes respectives à l'agent \texttt{MATCHING} à chaque \emph{tick}. Ce dernier fait tourner un algorithme d'appariement et en cas de succès leur répond \emph{job/employee found}. Les agents \texttt{PERSON} \emph{employed} envoient à chaque \texttt{tick} leur productivité à l'agent \texttt{COMPANY} correspondant, qui en fonction de si cette productivité est supérieure ou non à un certain seuil, décide de garder ou de licencier l'employé.
+    Pour apparier les agents texttt{PERSON} et \texttt{COMPANY}, l'agent \texttt{MATCHING} procède de la façon suivante : pour modéliser les connaissances incomplètes des gens dans le monde réel, il considère à chaque \texttt{tick} un nombre limité d'appariement possibles et décide de si ils sont acceptables ou non en fonction de la valeur de similarité.
+    
+    \subsubsection{Ecrivez toutes les formules ou les algorithmes (en pseudo-code) permettant de calculer l'ensemble du modèle. On décrira (en pseudo code) notamment la boucle principale ("tick") de la simulation.}
+
+    A chaque \texttt{tick}, 3 procédures principales sont lancées: \\
+    
+    \begin{algorithm}[H]
+    \caption{tick}
+    \SetAlgoLined
+    \While{simulation en cours}{
+     annonce des agents\\
+     procédure d'appariement\\
+     mise à jour des \emph{jobs}\\
+    }
+    \end{algorithm}
+    
+    \vspace{0.5cm}
+    
+    \begin{algorithm}[H]
+    \caption{annonce des agents}
+    \SetAlgoLined
+    \Switch {Type d'agent} {
+     \Case {PERSON} {
+      \If{situation = unemployed} {
+       envoie message à MATCHING "looking for a job"\\
+       \If{réponse = "matching found with company : entreprise"}{
+        situation $\gets$ employed \\
+        employer $\gets$ entreprise \\
+       }
+      }
+     }
+     \Case {COMPANY} {
+      \If{job = vacant} {
+       envoie message à MATCHING "looking for an employee"\\
+       \If{réponse = "matching found with person : personne"}{
+        job $\gets$ filled \\
+        employee $\gets$ personne \\
+       }
+      }
+     }
+    }
+    \end{algorithm}
+    
+    \vspace{0.5cm}
+    
+    \begin{algorithm}[H]
+    \caption{procédure d'appariement}
+    \SetAlgoLined
+    \KwData{nb : limite du nombre de couples à considérer à chaque tick}
+    \KwData{seuil de similarité : seuil de similarité à partir duquel l'embauche à lieu}
+    \KwData{liste des PERSON : liste des agents PERSON à le recherche d'un \emph{job}}
+    \KwData{liste des COMPANY : liste des agents COMPANY à le recherche d'un \emph{employee}}
+    \For{i $\gets$ 1 \KwTo nb} {
+     personne $\gets$ sélectionner au hasard un agent dans la liste des PERSON\\
+     entreprise $\gets$ sélectionner au hasard un agent dans la liste des COMPANY\\
+     Similarité $\gets$ fonction de calcul de la similarité \\
+     \If{ similarité $>$ seuil de similarité} {
+      retirer personne de la liste des PERSON
+      retirer entreprise de la liste des COMPANY
+      envoyer message à personne "matching found with company : entreprise"
+      envoyer message à entreprise "matching found with person : personne"
+     }   
+    }
+    \end{algorithm}
+    
+    \vspace{0.5cm}
+    
+    \begin{algorithm}[H]
+    \caption{mise à jour des \emph{jobs}}
+    \SetAlgoLined
+    \KwData{seuil de productivité : seuil de productivité en-dessous duquel l'employé est licencié}
+    \KwData{liste des PERSON unemployed : liste des agents PERSON qui ont un \emph{job}}
+    \ForEach {personne dans la liste des PERSON unemployed} {  
+     productivité $\gets$ fonction de calcul de la productivité
+     entreprise $\gets$ personne.employer
+     \If{ productivité $<$ seuil de productivité} {
+      entreprise.employee $\gets$ NULL
+      entreprise.job $\gets$ vacant
+      personne.employer $\gets$ NULL
+      personne.situation $\gets$ unemployed
+     } 
+    }
+    \end{algorithm}
+    
+    \vspace{0.5cm}
+    
+    remarque : Les algorithmes procédure d'appariement et mise à jour des \emph{jobs} considère que toutes les entreprises et toutes les personnes ont les mêmes exigences d'affinité pour un emploi et de productivité de la part de leur employés, ce qui n'est pas le cas dans le mond réel. Cela pourrait être pris en compte en rajoutant le seuil de similarité et de productivité voulus en tant qu'attribut des agents \texttt{PERSON} et \texttt{COMPANY}.
+    
+    
+    
+    \subsection{Programmer le modèle en Netlogo, en pensant également à l'utilisation de votre programme pour la simulation, i.e. la conception de l'interface.}
+    
+    \subsubsection{Quels sont les paramètres de la simulation ?}
+    
+    \subsubsection{On souhaite visualiser en temps réels les agents et leurs interactions. Que proposez-vous ?}
+    
+    \subsubsection{ Comment reproduire la courbe de Beveridge de l'article (e.g. Fig. 2) directement à partir de l'interface en cliquant sur un bouton (sans passer par des fichiers extérieurs par exemple) ?}
+    
+    \subsection{Faites tourner votre simulation pour reproduire les résultats de la Figure 2, en indiquant la valeur des paramètres utilisés et une copie d'écran du résultat. Décrivez en particulier votre procédure d'initialisation de la simulation.}
+    
+    \subsection{Afficher l'évolution dans le temps de la courbe de chômage. Est-elle stable à partir d'un certain temps ? Pourquoi ? Quelles autres mesures économiques proposez-vous pour évaluer l'efficacité du marché ? Calculez et affichez les. Discutez les résultats.}
+    
+    \subsection{Effectuez la sensibilité aux paramètres de votre simulation. Faites varier chaque paramètre (les autres fixés) et observez l'évolution des résultats (Beveridge, chômage, indicateurs proposés en 1.4). Expliquez les résultats.}
+    
+    \section{Extensions du modèle}
+    
+    \subsection{Proposez et ajoutez d'autres critères (au moins 2) pour l'appariement par similarité (décrit p.4 dans l'article). Quelle influence sur les résultats ? Simulez, montrez, et discutez les résultats.}
+    
+    \subsection{L'appendice A décrit un processus très couramment employé dans les modèles microéconomiques du marché du travail : l'utilisation d'une fonction (gloable) d'appariement. Il s'agit d'un extrait de l'article Looking into the black box: a survey of the matching function de Petrongolo et Pissarides.
+    Remplacez dans le modèle le processus d'appariement par similarités en utilisant la fonction d'appariement donnée par l'équation 6 de l'appendice A. Quels sont les paramètres nouveaux de ce modèle ? Comparez avec le modèle de base et et discutez les résultats. Quelle est la meilleure approche selon vous ici ?}
+    
+    \subsection{On souhaite introduire un processus de démission des employés.}
+    
+    \subsubsection{Dans un premier temps, proposez un mécanisme totalement aléatoire (type "boîte noire", le plus simple possible). Décrivez les nouveaux algorithmes en pseudo code, puis simulez et discutez les résultats obtenus.}
+    
+    \subsubsection{Afin d'augmenter le réalisme, proposez un mécanisme de décision de la démission, en introduisant une variable de satisfaction au travail de l'employé qui devra évoluer dans le temps selon des règles stochastiques simples que vous définirez.. Donner l'algorithme en pseudo code, implémentez, simulez et discutez les résultats.}
+    
+    \subsection{Perspectives}
+    
+    \subsubsection{Quelles sont les limites du modèle final obtenu ? Que suggérez-vous pour l'améliorer ?}
+  Idées en vrac :
+   \begin{itemize}
+    \item vieillissement de la population
+    \item entrée et sortie des agents actif/non actif
+    \item entreprise proposent plusieurs jobs
+    \item différentes exigence en matière de similarité et productivité voulues pour les personnes et les entreprises
+    \item gestion de la location plus complexe : distance par rapport au travail/ distance accepté spécifique à chaque personne
+    \item gestion du salaire plus complexe : au lieu d'un booléen salaire minumum atteint oui/non, prendre en compte le salaire proposé
+    \item fonction de productivité  beaucoup à améliorer
+    \end{itemize}
+    
+    \subsubsection{Parmi les améliorations suggérées, en choisir une, implémentez et testez en discutant les résultats. NB : La note de cette question sera proportionnelle à la pertinence et au degré de sophistication de la variante !}
+    
+
+\end{document}
