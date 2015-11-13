@@ -21,7 +21,6 @@ breed [matching matching-agent]
 
 persons-own [skills location salary employed employer]
 companies-own [skills location salary job_filled employee]
-matching-own [ulist vList] ;list of unemployed persons, list of companies with vacant jobs
 
 
 
@@ -55,8 +54,6 @@ to setup-matching-agent
     set color white
     set size 2
     setxy 0 0
-    set uList []
-    set vList []
   ]
 end
 
@@ -96,51 +93,28 @@ end
 
 to go
   if ticks >= timeout [stop] ;;prédicat d'arret
-  agents-announces
+  ;agents-announces Devenu inutile, vu qu'on a pas besoin d'entretenir une list des demandeurs d'emploi et postes vacants
   agents-matching
   update-jobs
   tick
 end
 
-; TODO changer le one_of matching
-to agents-announces
-  ask persons [
-    if not employed [
-      set color color-person-unemployed
-      ask one-of matching [ ;send "looking for a job" 
-        add-unemployed [who] of myself
-      ]
-    ]
-  ]
-  ask companies [
-    if not job_filled [      
-      set color color-company-vacant-job
-      ask one-of matching [ ;send "looking for an employee" 
-        add-vacancy [who] of myself
-      ]
-    ]
-  ]
-end
-
 to agents-matching
   ask matching [
-    if (not empty? uList) and (not empty? vList) [
-      let counting 1
+      let counting 0
+      let number_of_loops min (list number_of_pairs_considered
+                                    count persons with [not employed]
+                                    count companies with [not job_filled])
       let random-person nobody
       let random-company nobody
-      while [counting <= number_of_pairs_considered ] [
-        set random-person one-of persons 
-        set random-company one-of companies 
-        ; TODO lignes suivante se sont mis à plus marcher alors que j'y touchais plus depuis 1h : A CORRIGER
-        ;set random-person person one-of uList
-        ;set random-company company one-of vList
-        
+      while [counting < number_of_loops ] [
+        set random-person one-of persons with [not employed]
+        set random-company one-of companies with [not job_filled]    
         if compare random-person random-company [
           hiring_procedure random-person random-company
         ]
         set counting counting + 1
       ]
-    ]
   ]
 end
 
@@ -158,32 +132,6 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                         MATCHING PROCEDURES                          ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-to add-unemployed [personId]
-  if not member? personId uList [
-    set uList lput personId uList
-  ]
-end
-
-to remove-unemployed [personId]
-  if member? personId uList [
-    set uList remove personId uList
-  ]
-end
-
-to add-vacancy [companyId]
-  if not member? companyId vList [
-    set vList lput companyId vList
-  ]
-end
-
-to remove-vacancy [companyId]
-  if member? companyId vList [
-    set vList remove companyId vList
-  ]
-end
-
-
 
 ; fonction qui se charge de comparer les exigences d'une PERSON et d'une COMPANY
 ; renvoie un bolléen : si les 2 agents se correspondent ou pas
@@ -220,20 +168,8 @@ to-report compute-similarity_location [location1 location2]
 end
 
 to-report compute-similarity_salary [salary1 salary2]  
-  ; TODO J'ai cherché pendant 1/2h comment faire un max sur 2 variables, j'ai toujours pas trouvé !!!!!!!!
-  ;let max_salary max [salary1 salary2]
-  ;let max_salary min [salary1 salary2]
-  ; Alors à la place :
-  let max_salary salary2
-  let min_salary salary1
-  ifelse salary1 > salary2 [
-    set max_salary salary1
-    set min_salary salary2
-  ]
-  [
-    set max_salary salary2
-    set min_salary salary1
-  ]
+  let max_salary max List salary1 salary2
+  let min_salary min List salary1 salary2
   report (max_salary - min_salary) / max_salary
   
 end
@@ -257,9 +193,6 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 to hiring_procedure [person company] 
-  remove-unemployed [who] of person
-  remove-vacancy [who] of company
-  ;remove-vacancy [who] of company
   ask person [
     set color color-person-employed
     set employed True  
@@ -380,7 +313,7 @@ number_of_persons
 number_of_persons
 10
 500
-10
+38
 1
 1
 NIL
@@ -395,7 +328,7 @@ number_of_companies
 number_of_companies
 10
 500
-10
+20
 1
 1
 NIL
@@ -410,7 +343,7 @@ number_of_pairs_considered
 number_of_pairs_considered
 0
 100
-28
+5
 1
 1
 NIL
@@ -449,13 +382,13 @@ HORIZONTAL
 SLIDER
 245
 185
-466
+432
 218
 number_of_locations_possibles
 number_of_locations_possibles
 1
 10
-7
+3
 1
 1
 NIL
@@ -515,7 +448,7 @@ firing_quality_threshold
 firing_quality_threshold
 0
 1
-0.3
+0.2
 0.1
 1
 NIL
@@ -560,7 +493,7 @@ unexpected_worker_motivation
 unexpected_worker_motivation
 0
 1
-0.1
+0
 0.1
 1
 NIL
