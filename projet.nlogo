@@ -1,52 +1,294 @@
-globals [employment_level]  ;;
+globals [ ; EN COMMENTAIRES : ceux qui sont défini sur l'interface TODO : changer les noms des variables et les redéfinir dans setup-globals
+  employment_level
+  color-person-employed
+  color-person-unemployed
+  color-company-filled-job
+  color-company-vacant-job
+  ;number_of_persons
+  ;number_of_companies
+  ;number_of_pairs_considered
+  ;minimum_salary
+  ;maximum_salary
+  ;number_of_locations_possibles
+  minimum_similarity_required
+  minimum_productivity_required
+  
+    
+]  ;;
 breed [persons person]
 breed [companies company]
+breed [matching matching-agent]
 
-;;breed [matching matching-agent]
-;;utilité de l'agent matching quand on peut avoir la liste des unemployed/vacant ?
+persons-own [skills location salary employed employer]
+companies-own [skills location salary job_filled employee]
+matching-own [ulist vList] ;list of unemployed persons, list of companies with vacant jobs
 
-turtles-own [skills location salary]
-patches-own [countdown]
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                 SETUP                                ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 to setup
   clear-all
-  setup-patches
-  setup-turtles
+  
+  setup-globals
+  setup-matching-agent
+  setup-persons
+  setup-companies
+  
   reset-ticks
 end
 
-to setup-patches
-  ;;todo
+to setup-globals
+  set color-person-employed 67
+  set color-person-unemployed 17
+  set color-company-filled-job 63
+  set color-company-vacant-job 17
+  set minimum_similarity_required matching_quality_threshold
+  set minimum_productivity_required firing_quality_threshold
 end
 
-to setup-turtles
-  ;;todo
+to setup-matching-agent
+  set-default-shape matching "square 2"
+  create-matching 1 [
+    set color white
+    set size 2
+    setxy 0 0
+    set uList []
+    set vList []
+  ]
 end
+
+to setup-persons
+  set-default-shape persons "person"
+  set-default-shape companies "house"
+  create-persons number_of_persons [
+    set color color-person-unemployed
+    set size 2
+    set-random-skills-location-salary
+    set employed False
+    set employer nobody
+    setxy random-xcor random-ycor
+  ]
+end
+
+to setup-companies  
+  create-companies number_of_companies [
+    set color color-company-vacant-job
+    set size 2
+    set-random-skills-location-salary
+    set job_filled False
+    set employee nobody
+    setxy random-xcor random-ycor
+  ]
+end
+
+to set-random-skills-location-salary
+  set skills (list random 2 random 2 random 2 random 2 random 2)
+  set location random number_of_locations_possibles
+  set salary minimum_salary + random (maximum_salary - minimum_salary)
+end
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                                 GO                                   ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 to go
   if ticks >= timeout [stop] ;;prédicat d'arret
   agents-announces
-  agent-matching
+  agents-matching
   update-jobs
   tick
 end
 
+; TODO changer le one_of matching
 to agents-announces
-  ;;todo
+  ask persons [
+    if not employed [
+      set color color-person-unemployed
+      ask one-of matching [ ;send "looking for a job" 
+        add-unemployed [who] of myself
+      ]
+    ]
+  ]
+  ask companies [
+    if not job_filled [      
+      set color color-company-vacant-job
+      ask one-of matching [ ;send "looking for an employee" 
+        add-vacancy [who] of myself
+      ]
+    ]
+  ]
 end
 
-to agent-matching
-  ;;todo
+to agents-matching
+  ask matching [
+    if (not empty? uList) and (not empty? vList) [
+      let counting 1
+      let random-person nobody
+      let random-company nobody
+      while [counting <= number_of_pairs_considered ] [
+        set random-person one-of persons 
+        set random-company one-of companies 
+        ; TODO lignes suivante se sont mis à plus marcher alors que j'y touchais plus depuis 1h : A CORRIGER
+        ;set random-person person one-of uList
+        ;set random-company company one-of vList
+        
+        if compare random-person random-company [
+          hiring_procedure random-person random-company
+        ]
+        set counting counting + 1
+      ]
+    ]
+  ]
 end
 
 to update-jobs
-  ;;todo
+  ask persons [
+    if employed [
+      let productivity compute-productivity
+      if productivity < minimum_productivity_required [
+        firing_procedure [employee] of employer employer
+      ]
+    ]
+  ]
+end
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                         MATCHING PROCEDURES                          ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to add-unemployed [personId]
+  if not member? personId uList [
+    set uList lput personId uList
+  ]
+end
+
+to remove-unemployed [personId]
+  if member? personId uList [
+    set uList remove personId uList
+  ]
+end
+
+to add-vacancy [companyId]
+  if not member? companyId vList [
+    set vList lput companyId vList
+  ]
+end
+
+to remove-vacancy [companyId]
+  if member? companyId vList [
+    set vList remove companyId vList
+  ]
+end
+
+
+
+; fonction qui se charge de comparer les exigences d'une PERSON et d'une COMPANY
+; renvoie un bolléen : si les 2 agents se correspondent ou pas
+to-report compare [person company]
+  let similarity compute-similarity person company
+  report similarity >= minimum_similarity_required
+end
+
+; fonction qui calcule la valeur de la similarité
+; renvoie un nombre entre 0 et 1
+to-report compute-similarity [person company]
+  let similarity_skills compute-similarity_skills [skills] of person [skills] of company
+  let similarity_location compute-similarity_location [location] of person [location] of company
+  let similarity_salary compute-similarity_salary [salary] of person [salary] of company
+  report (similarity_skills + similarity_location + similarity_salary) / 3
+end
+
+to-report compute-similarity_skills [skills1 skills2]
+  let counting 0
+  (foreach skills1 skills2 [
+    if ?1 = ?2 [
+       set counting counting + 1 
+    ]
+  ])
+  report counting / length skills1
+  
+end
+
+
+to-report compute-similarity_location [location1 location2]
+  ifelse location1 = location2
+  [report 1]
+  [report 0]
+end
+
+to-report compute-similarity_salary [salary1 salary2]  
+  ; TODO J'ai cherché pendant 1/2h comment faire un max sur 2 variables, j'ai toujours pas trouvé !!!!!!!!
+  ;let max_salary max [salary1 salary2]
+  ;let max_salary min [salary1 salary2]
+  ; Alors à la place :
+  let max_salary salary2
+  let min_salary salary1
+  ifelse salary1 > salary2 [
+    set max_salary salary1
+    set min_salary salary2
+  ]
+  [
+    set max_salary salary2
+    set min_salary salary1
+  ]
+  report (max_salary - min_salary) / max_salary
+  
+end
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                             PRODUCTIVITY                             ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; fonction qui calcule la productivité d'une PERSON
+; renvoie un nombre entre 0 et 1
+; on prend un nombre aléatoirement selon une loi normale, car c'est plus logique qu'un random complet
+to-report compute-productivity ; un nombre entre 0 et 1
+  report random-normal 0.5 0.25
+end
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                     HIRING AND FIRING PROCEDURES                     ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to hiring_procedure [person company] 
+  remove-unemployed [who] of person
+  remove-vacancy [who] of company
+  ;remove-vacancy [who] of company
+  ask person [
+    set color color-person-employed
+    set employed True  
+    set employer company  
+  ]
+  ask company [
+    set color color-company-filled-job
+    set job_filled True  
+    set employee person
+  ]
+end
+
+to firing_procedure [person company]
+  ask person [
+    set color color-person-unemployed
+    set employed False  
+    set employer nobody  
+  ]
+  ask company [
+    set color color-company-vacant-job
+    set job_filled False  
+    set employee nobody
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-350
+502
 10
-819
+971
 500
 25
 25
@@ -105,11 +347,11 @@ NIL
 0
 
 TEXTBOX
-9
-68
-161
-86
-Grass settings
+22
+252
+173
+270
+Matching
 11
 0.0
 0
@@ -129,116 +371,235 @@ timeout
 NIL
 HORIZONTAL
 
+SLIDER
+17
+106
+189
+139
+number_of_persons
+number_of_persons
+10
+500
+10
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+17
+149
+191
+182
+number_of_companies
+number_of_companies
+10
+500
+10
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+17
+272
+227
+305
+number_of_pairs_considered
+number_of_pairs_considered
+0
+100
+28
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+245
+144
+417
+177
+minimum_salary
+minimum_salary
+500
+1500
+1000
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+246
+101
+418
+134
+maximum_salary
+maximum_salary
+2000
+10000
+2000
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+245
+185
+466
+218
+number_of_locations_possibles
+number_of_locations_possibles
+1
+10
+7
+1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+248
+80
+402
+98
+Personal preferences
+11
+0.0
+1
+
+SLIDER
+242
+273
+445
+306
+matching_quality_threshold
+matching_quality_threshold
+0
+1
+0.1
+0.1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+22
+83
+172
+101
+System settings
+11
+0.0
+1
+
+TEXTBOX
+21
+371
+171
+389
+Productivity
+11
+0.0
+1
+
+SLIDER
+16
+390
+196
+423
+firing_quality_threshold
+firing_quality_threshold
+0
+1
+0.3
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+16
+431
+198
+464
+unexpected_firing
+unexpected_firing
+0
+1
+0.1
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+14
+310
+227
+343
+unexpected_company_motivation
+unexpected_company_motivation
+0
+1
+0
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+242
+312
+445
+345
+unexpected_worker_motivation
+unexpected_worker_motivation
+0
+1
+0.1
+0.1
+1
+NIL
+HORIZONTAL
+
 @#$#@#$#@
 ## WHAT IS IT?
 
-This model explores the stability of predator-prey ecosystems. Such a system is called unstable if it tends to result in extinction for one or more species involved.  In contrast, a system is stable if it tends to maintain itself over time, despite fluctuations in population sizes.
 
 ## HOW IT WORKS
 
-There are two main variations to this model.
-
-In the first variation, wolves and sheep wander randomly around the landscape, while the wolves look for sheep to prey on. Each step costs the wolves energy, and they must eat sheep in order to replenish their energy - when they run out of energy they die. To allow the population to continue, each wolf or sheep has a fixed probability of reproducing at each time step. This variation produces interesting population dynamics, but is ultimately unstable.
-
-The second variation includes grass (green) in addition to wolves and sheep. The behavior of the wolves is identical to the first variation, however this time the sheep must eat grass in order to maintain their energy - when they run out of energy they die. Once grass is eaten it will only regrow after a fixed amount of time. This variation is more complex than the first, but it is generally stable.
-
-The construction of this model is described in two papers by Wilensky & Reisman referenced below.
 
 ## HOW TO USE IT
 
-1. Set the GRASS? switch to TRUE to include grass in the model, or to FALSE to only include wolves (red) and sheep (white).
-2. Adjust the slider parameters (see below), or use the default settings.
-3. Press the SETUP button.
-4. Press the GO button to begin the simulation.
-5. Look at the monitors to see the current population sizes
-6. Look at the POPULATIONS plot to watch the populations fluctuate over time
-
 Parameters:
-INITIAL-NUMBER-SHEEP: The initial size of sheep population
-INITIAL-NUMBER-WOLVES: The initial size of wolf population
-SHEEP-GAIN-FROM-FOOD: The amount of energy sheep get for every grass patch eaten
-WOLF-GAIN-FROM-FOOD: The amount of energy wolves get for every sheep eaten
-SHEEP-REPRODUCE: The probability of a sheep reproducing at each time step
-WOLF-REPRODUCE: The probability of a wolf reproducing at each time step
-GRASS?: Whether or not to include grass in the model
-GRASS-REGROWTH-TIME: How long it takes for grass to regrow once it is eaten
-SHOW-ENERGY?: Whether or not to show the energy of each animal as a number
 
-Notes:
-- one unit of energy is deducted for every step a wolf takes
-- when grass is included, one unit of energy is deducted for every step a sheep takes
 
 ## THINGS TO NOTICE
 
-When grass is not included, watch as the sheep and wolf populations fluctuate. Notice that increases and decreases in the sizes of each population are related. In what way are they related? What eventually happens?
-
-Once grass is added, notice the green line added to the population plot representing fluctuations in the amount of grass. How do the sizes of the three populations appear to relate now? What is the explanation for this?
-
-Why do you suppose that some variations of the model might be stable while others are not?
 
 ## THINGS TO TRY
 
-Try adjusting the parameters under various settings. How sensitive is the stability of the model to the particular parameters?
-
-Can you find any parameters that generate a stable ecosystem that includes only wolves and sheep?
-
-Try setting GRASS? to TRUE, but setting INITIAL-NUMBER-WOLVES to 0. This gives a stable ecosystem with only sheep and grass. Why might this be stable while the variation with only sheep and wolves is not?
-
-Notice that under stable settings, the populations tend to fluctuate at a predictable pace. Can you find any parameters that will speed this up or slow it down?
-
-Try changing the reproduction rules -- for example, what would happen if reproduction depended on energy rather than being determined by a fixed probability?
 
 ## EXTENDING THE MODEL
 
-There are a number ways to alter the model so that it will be stable with only wolves and sheep (no grass). Some will require new elements to be coded in or existing behaviors to be changed. Can you develop such a version?
-
-Can you modify the model so the sheep will flock?
-
-Can you modify the model so that wolf actively chase sheep?
 
 ## NETLOGO FEATURES
 
-Note the use of breeds to model two different kinds of "turtles": wolves and sheep. Note the use of patches to model grass.
-
-Note use of the ONE-OF agentset reporter to select a random sheep to be eaten by a wolf.
 
 ## RELATED MODELS
 
-Look at Rabbits Grass Weeds for another model of interacting populations with different rules.
 
 ## CREDITS AND REFERENCES
 
-Wilensky, U. & Reisman, K. (1999). Connected Science: Learning Biology through Constructing and Testing Computational Theories -- an Embodied Modeling Approach. International Journal of Complex Systems, M. 234, pp. 1 - 12. (This model is a slightly extended version of the model described in the paper.)
-
-Wilensky, U. & Reisman, K. (2006). Thinking like a Wolf, a Sheep or a Firefly: Learning Biology through Constructing and Testing Computational Theories -- an Embodied Modeling Approach. Cognition & Instruction, 24(2), pp. 171-209. http://ccl.northwestern.edu/papers/wolfsheep.pdf
 
 ## HOW TO CITE
 
-If you mention this model or the NetLogo software in a publication, we ask that you include the citations below.
-
-For the model itself:
-
-* Wilensky, U. (1997).  NetLogo Wolf Sheep Predation model.  http://ccl.northwestern.edu/netlogo/models/WolfSheepPredation.  Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
-
-Please cite the NetLogo software as:
-
-* Wilensky, U. (1999). NetLogo. http://ccl.northwestern.edu/netlogo/. Center for Connected Learning and Computer-Based Modeling, Northwestern University, Evanston, IL.
 
 ## COPYRIGHT AND LICENSE
-
-Copyright 1997 Uri Wilensky.
-
-![CC BY-NC-SA 3.0](http://ccl.northwestern.edu/images/creativecommons/byncsa.png)
-
-This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License.  To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/3.0/ or send a letter to Creative Commons, 559 Nathan Abbott Way, Stanford, California 94305, USA.
-
-Commercial licenses are also available. To inquire about commercial licenses, please contact Uri Wilensky at uri@northwestern.edu.
-
-This model was created as part of the project: CONNECTED MATHEMATICS: MAKING SENSE OF COMPLEX PHENOMENA THROUGH BUILDING OBJECT-BASED PARALLEL MODELS (OBPML).  The project gratefully acknowledges the support of the National Science Foundation (Applications of Advanced Technologies Program) -- grant numbers RED #9552950 and REC #9632612.
-
-This model was converted to NetLogo as part of the projects: PARTICIPATORY SIMULATIONS: NETWORK-BASED DESIGN FOR SYSTEMS LEARNING IN CLASSROOMS and/or INTEGRATED SIMULATION AND MODELING ENVIRONMENT. The project gratefully acknowledges the support of the National Science Foundation (REPP & ROLE programs) -- grant numbers REC #9814682 and REC-0126227. Converted from StarLogoT to NetLogo, 2000.
-
-<!-- 1997 2000 -->
 @#$#@#$#@
 default
 true
@@ -546,7 +907,7 @@ Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 
 @#$#@#$#@
-NetLogo 5.2.1
+NetLogo 5.2.0
 @#$#@#$#@
 setup
 set grass? true
