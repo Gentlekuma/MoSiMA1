@@ -1,4 +1,4 @@
-globals [ ; EN COMMENTAIRES : ceux qui sont défini sur l'interface TODO : changer les noms des variables et les redéfinir dans setup-globals
+globals [ ; EN COMMENTAIRES : ceux qui sont définis sur l'interface TODO : changer les noms des variables et les redéfinir dans setup-globals
   employment_level
   color-person-employed
   color-person-unemployed
@@ -12,6 +12,11 @@ globals [ ; EN COMMENTAIRES : ceux qui sont défini sur l'interface TODO : chang
   ;number_of_locations_possibles
   minimum_similarity_required
   minimum_productivity_required
+  labor_force
+  unemployement_level
+  unemployement_rate
+  vacancy_level
+  vacancy_rate
   
     
 ]  ;;
@@ -46,6 +51,7 @@ to setup-globals
   set color-company-vacant-job 17
   set minimum_similarity_required matching_quality_threshold
   set minimum_productivity_required firing_quality_threshold
+  set labor_force number_of_persons ; on considère pour le moment comme agents que les travailleurs dans un système fermé
 end
 
 to setup-matching-agent
@@ -66,7 +72,7 @@ to setup-persons
     set-random-skills-location-salary
     set employed False
     set employer nobody
-    setxy random-xcor random-ycor
+    setup-xy
   ]
 end
 
@@ -77,7 +83,7 @@ to setup-companies
     set-random-skills-location-salary
     set job_filled False
     set employee nobody
-    setxy random-xcor random-ycor
+    setup-xy
   ]
 end
 
@@ -87,15 +93,27 @@ to set-random-skills-location-salary
   set salary minimum_salary + random (maximum_salary - minimum_salary)
 end
 
+; les agents (PERSON et COMPANY) sont disposés en fonction de leur LOCATION
+to setup-xy
+  let x random-pxcor
+  let y min-pycor + location * (max-pycor - min-pycor) / number_of_locations_possibles + random (max-pycor - min-pycor)/ number_of_locations_possibles  
+  setxy x + 0.25 y + 0.25
+end
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                 GO                                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 to go
   if ticks >= timeout [stop] ;;prédicat d'arret
-  ;agents-announces Devenu inutile, vu qu'on a pas besoin d'entretenir une list des demandeurs d'emploi et postes vacants
-  agents-matching
-  update-jobs
+  
+    ;agents-announces Devenu inutile, vu qu'on a pas besoin d'entretenir une list des demandeurs d'emploi et postes vacants
+    agents-matching
+    update-jobs
+  
+    compute-values
+  
   tick
 end
 
@@ -196,7 +214,8 @@ to hiring_procedure [person company]
   ask person [
     set color color-person-employed
     set employed True  
-    set employer company  
+    set employer company 
+    create-link-with company 
   ]
   ask company [
     set color color-company-filled-job
@@ -210,12 +229,26 @@ to firing_procedure [person company]
     set color color-person-unemployed
     set employed False  
     set employer nobody  
+    ask my-links [die]
   ]
   ask company [
     set color color-company-vacant-job
     set job_filled False  
     set employee nobody
   ]
+end
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                            PRINTING CURVES                           ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to compute-values
+  set unemployement_level count persons with [not employed]
+  set vacancy_level count companies with [not job_filled] 
+  set unemployement_rate unemployement_level / labor_force
+  set vacancy_rate vacancy_level / labor_force
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -313,7 +346,7 @@ number_of_persons
 number_of_persons
 10
 500
-38
+60
 1
 1
 NIL
@@ -328,7 +361,7 @@ number_of_companies
 number_of_companies
 10
 500
-20
+50
 1
 1
 NIL
@@ -413,7 +446,7 @@ matching_quality_threshold
 matching_quality_threshold
 0
 1
-0.1
+0.6
 0.1
 1
 NIL
@@ -498,6 +531,65 @@ unexpected_worker_motivation
 1
 NIL
 HORIZONTAL
+
+PLOT
+1016
+57
+1216
+207
+unemployement and vacancy rate
+time
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"unemployement_rate" 1.0 0 -955883 true "" "plot unemployement_rate"
+"vacancy_rate" 1.0 0 -14454117 true "" "plot vacancy_rate"
+
+MONITOR
+1008
+239
+1139
+284
+unemployement_rate
+unemployement_rate
+17
+1
+11
+
+MONITOR
+1165
+237
+1298
+282
+vacancy_rate
+vacancy_rate
+17
+1
+11
+
+PLOT
+1084
+342
+1284
+492
+courbe de Beveridge
+unemployement_rate
+vacancy_rate
+0.0
+1.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 2 -16777216 true "" "plotxy unemployement_rate vacancy_rate"
 
 @#$#@#$#@
 ## WHAT IS IT?
