@@ -1,5 +1,4 @@
 globals [ ; EN COMMENTAIRES : ceux qui sont définis sur l'interface TODO : changer les noms des variables et les redéfinir dans setup-globals
-  employment_level
   color-person-employed
   color-person-unemployed
   color-company-filled-job
@@ -10,6 +9,10 @@ globals [ ; EN COMMENTAIRES : ceux qui sont définis sur l'interface TODO : chan
   ;minimum_salary
   ;maximum_salary
   ;number_of_locations_possibles
+  ;unexpected_company_motivation
+  ;unexpected_worker_motivation
+  ;maximum_productivity_fluctuation
+  ;unexpected_firing
   minimum_similarity_required
   minimum_productivity_required
   labor_force
@@ -17,14 +20,14 @@ globals [ ; EN COMMENTAIRES : ceux qui sont définis sur l'interface TODO : chan
   unemployement_rate
   vacancy_level
   vacancy_rate
-  
+  convergence
     
 ]  ;;
 breed [persons person]
 breed [companies company]
 breed [matching matching-agent]
 
-persons-own [skills location salary employed employer]
+persons-own [skills location salary reference_productivity employed employer]
 companies-own [skills location salary job_filled employee]
 
 
@@ -44,6 +47,7 @@ to setup
   reset-ticks
 end
 
+; procédure d'initialisation des variables globales
 to setup-globals
   set color-person-employed 67
   set color-person-unemployed 17
@@ -52,8 +56,10 @@ to setup-globals
   set minimum_similarity_required matching_quality_threshold
   set minimum_productivity_required firing_quality_threshold
   set labor_force number_of_persons ; on considère pour le moment comme agents que les travailleurs dans un système fermé
+  set convergence False;
 end
 
+; procédure d'initialisation de l'agent MATCHING
 to setup-matching-agent
   set-default-shape matching "square 2"
   create-matching 1 [
@@ -63,6 +69,7 @@ to setup-matching-agent
   ]
 end
 
+; procédure d'initialisation des agents PERSON
 to setup-persons
   set-default-shape persons "person"
   set-default-shape companies "house"
@@ -70,12 +77,14 @@ to setup-persons
     set color color-person-unemployed
     set size 2
     set-random-skills-location-salary
+    set-productivity
     set employed False
     set employer nobody
-    setup-xy
+    set-xy
   ]
 end
 
+; procédure d'initialisation des agents COMPANY
 to setup-companies  
   create-companies number_of_companies [
     set color color-company-vacant-job
@@ -83,18 +92,25 @@ to setup-companies
     set-random-skills-location-salary
     set job_filled False
     set employee nobody
-    setup-xy
+    set-xy
   ]
 end
 
+; procédure qui fixe les valeurs de compétences, lieu et salaires pour chaque agent (PERSON et COMPANY)
 to set-random-skills-location-salary
   set skills (list random 2 random 2 random 2 random 2 random 2)
   set location random number_of_locations_possibles
   set salary minimum_salary + random (maximum_salary - minimum_salary)
 end
 
-; les agents (PERSON et COMPANY) sont disposés en fonction de leur LOCATION
-to setup-xy
+; procédure qui fixe la valeur de référence de la productivité de l'employé au hasard selon une loi normale (pour le pas avoir de valeurs trop extrèmes)
+to set-productivity
+  set reference_productivity random-normal 0.8 0.2
+end
+
+; procédure que dispose les agents (PERSON et COMPANY) en fonction de leur attribut LOCATION
+; on considère les différents lieux comme des bandes horizontales sur la zone d'affichage
+to set-xy
   let x random-pxcor
   let y min-pycor + location * (max-pycor - min-pycor) / number_of_locations_possibles + random (max-pycor - min-pycor)/ number_of_locations_possibles  
   setxy x + 0.25 y + 0.25
@@ -105,10 +121,12 @@ end
 ;;                                 GO                                   ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; procédure de base, qui se déroule à chaque tour
+; pour le moment la notion de convergence est simpliste : si l'agent MATCHING n'a pas de paire à considérer, il considère que le système a convergé
 to go
-  if ticks >= timeout [stop] ;;prédicat d'arret
   
-    ;agents-announces Devenu inutile, vu qu'on a pas besoin d'entretenir une list des demandeurs d'emploi et postes vacants
+  if ticks >= timeout  or convergence [stop]
+  
     agents-matching
     update-jobs
   
@@ -117,35 +135,44 @@ to go
   tick
 end
 
+; procédure de matching
+; l'agent MATCHING va considérer à chaque tour au maximum number_of_pairs_considered et calculer la similarité entre l'entreprise et le condidat et déclencher la procédure d'embauche le cas échéant
 to agents-matching
   ask matching [
-      let counting 0
-      let number_of_loops min (list number_of_pairs_considered
-                                    count persons with [not employed]
-                                    count companies with [not job_filled])
-      let random-person nobody
-      let random-company nobody
-      while [counting < number_of_loops ] [
-        set random-person one-of persons with [not employed]
-        set random-company one-of companies with [not job_filled]    
-        if compare random-person random-company [
-          hiring_procedure random-person random-company
-        ]
-        set counting counting + 1
+    let number_of_loops min (list number_of_pairs_considered
+                                  count persons with [not employed]
+                                  count companies with [not job_filled])
+    let random-person nobody
+    let random-company nobody
+    repeat number_of_loops [
+      set random-person one-of persons with [not employed]
+      set random-company one-of companies with [not job_filled]    
+      if compare random-person random-company [
+        hiring_procedure random-person random-company
       ]
+    ]
+    if number_of_loops = 0 [
+      set convergence True
+    ]
   ]
 end
 
+; procédure qui a chaque tour, décide des productivité des employé et de si ils se font licencier ou non
+; on considère le paramètre unexpected_firing comme une augmentation des attentes de l'employeur qui a une probabilité d'arriver de exceptional_event_probability
 to update-jobs
   ask persons [
     if employed [
       let productivity compute-productivity
+      if ( random-float 1 < exceptional_event_probability) [
+        set productivity productivity - unexpected_firing
+      ]
       if productivity < minimum_productivity_required [
         firing_procedure [employee] of employer employer
       ]
     ]
   ]
 end
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                         MATCHING PROCEDURES                          ;;
@@ -154,19 +181,47 @@ end
 ; fonction qui se charge de comparer les exigences d'une PERSON et d'une COMPANY
 ; renvoie un bolléen : si les 2 agents se correspondent ou pas
 to-report compare [person company]
-  let similarity compute-similarity person company
+  let similarity-person compute-similarity-person person company
+  let similarity-company compute-similarity-company person company
+  let similarity mean List similarity-person similarity-company
   report similarity >= minimum_similarity_required
 end
 
-; fonction qui calcule la valeur de la similarité
+; fonction qui calcule la valeur de la similarité du point de vue de l'employé
 ; renvoie un nombre entre 0 et 1
-to-report compute-similarity [person company]
+;actuellement les deux fonctions sont semblables, comme le veut l'article, mais il sera possible de les différencier pour améliorer le modèle par la suite
+; on considère que la motivation execptionnelle intervient à ce niveau pour faire augmenter les chances que la personne accepte ce travail
+; elle a une probabilité d'arriver de exceptional_event_probability
+to-report compute-similarity-person [person company]
   let similarity_skills compute-similarity_skills [skills] of person [skills] of company
   let similarity_location compute-similarity_location [location] of person [location] of company
   let similarity_salary compute-similarity_salary [salary] of person [salary] of company
-  report (similarity_skills + similarity_location + similarity_salary) / 3
+  let similarity (similarity_skills + similarity_location + similarity_salary) / 3
+  if (random-float 1 < exceptional_event_probability) [
+    set similarity similarity + unexpected_worker_motivation
+  ]
+  report similarity
 end
 
+; fonction qui calcule la valeur de la similarité du point de vue de l'entreprise
+; renvoie un nombre entre 0 et 1
+;actuellement les deux fonctions sont semblables, comme le veut l'article, mais il sera possible de les différencier pour améliorer le modèle par la suite
+; on considère que la motivation execptionnelle intervient à ce niveau pour faire augmenter les chances que l'entreprise accepte cet employé
+; elle a une probabilité d'arriver de exceptional_event_probability
+to-report compute-similarity-company [person company]
+  let similarity_skills compute-similarity_skills [skills] of company [skills] of person
+  let similarity_location compute-similarity_location [location] of company [location] of person
+  let similarity_salary compute-similarity_salary [salary] of company [salary] of person
+  let similarity (similarity_skills + similarity_location + similarity_salary) / 3
+  if (random-float 1 < exceptional_event_probability) [
+    set similarity similarity + unexpected_company_motivation
+  ]
+  report similarity
+end
+
+; fonction qui calcule la similarité entre les compétences attendus par l'entreprise et celles possédées par le candidat
+; renvoie un nombre entre 0 et 1
+; elle renvoie le même résultat pour les agents PERSON et les agents COMPANY
 to-report compute-similarity_skills [skills1 skills2]
   let counting 0
   (foreach skills1 skills2 [
@@ -178,17 +233,20 @@ to-report compute-similarity_skills [skills1 skills2]
   
 end
 
-
+; fonction qui calcule la similarité entre les lieux de l'entreprise et du candidat
+; renvoie un nombre entre 0 et 1
+; elle renvoie le même résultat pour les agents PERSON et les agents COMPANY
 to-report compute-similarity_location [location1 location2]
   ifelse location1 = location2
   [report 1]
   [report 0]
 end
 
+; fonction qui retourne la similarité entre les salaires
+; renvoie un nombre entre 0 et 1
+; en fonction de l'ordre dans lequel on passe les paramètres, le résultat n'est pas le même (le premier salaire étant la valeur de référence)
 to-report compute-similarity_salary [salary1 salary2]  
-  let max_salary max List salary1 salary2
-  let min_salary min List salary1 salary2
-  report (max_salary - min_salary) / max_salary
+  report 1 - abs (salary1 - salary2) / salary1
   
 end
 
@@ -197,11 +255,18 @@ end
 ;;                             PRODUCTIVITY                             ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; fonction qui calcule la productivité d'une PERSON
+; fonction qui calcule la productivité d'une PERSON à chaque tour, en se basant sur la valeur de référence, propre à chaque agent
 ; renvoie un nombre entre 0 et 1
-; on prend un nombre aléatoirement selon une loi normale, car c'est plus logique qu'un random complet
-to-report compute-productivity ; un nombre entre 0 et 1
-  report random-normal 0.5 0.25
+; il s'agit d'une valeur comprise entre + ou - maximum_productivity_fluctuation de la valeur de référence de productivité de l'agent
+to-report compute-productivity
+  let productivity reference_productivity - maximum_productivity_fluctuation + random-float ( 2 * maximum_productivity_fluctuation)
+  if productivity < 0 [
+    set productivity 0
+  ]
+  if productivity > 1 [
+    set productivity 1
+  ]
+  report productivity
 end
 
 
@@ -210,6 +275,8 @@ end
 ;;                     HIRING AND FIRING PROCEDURES                     ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; procédure d'embauche
+; on met à jour les attributs des agents
 to hiring_procedure [person company] 
   ask person [
     set color color-person-employed
@@ -224,6 +291,8 @@ to hiring_procedure [person company]
   ]
 end
 
+; procédure de licenciement
+; on met à jour les attributs des agents
 to firing_procedure [person company]
   ask person [
     set color color-person-unemployed
@@ -313,10 +382,10 @@ NIL
 0
 
 TEXTBOX
-22
-252
-173
-270
+26
+273
+177
+291
 Matching
 11
 0.0
@@ -330,8 +399,8 @@ SLIDER
 timeout
 timeout
 100
-50000
-6900
+5000
+1000
 100
 1
 NIL
@@ -368,10 +437,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-17
-272
-227
-305
+21
+293
+231
+326
 number_of_pairs_considered
 number_of_pairs_considered
 0
@@ -391,7 +460,7 @@ minimum_salary
 minimum_salary
 500
 1500
-1000
+1500
 1
 1
 NIL
@@ -406,7 +475,7 @@ maximum_salary
 maximum_salary
 2000
 10000
-2000
+2153
 1
 1
 NIL
@@ -438,15 +507,15 @@ Personal preferences
 1
 
 SLIDER
-242
-273
-445
-306
+246
+294
+449
+327
 matching_quality_threshold
 matching_quality_threshold
 0
 1
-0.6
+0.5
 0.1
 1
 NIL
@@ -463,35 +532,35 @@ System settings
 1
 
 TEXTBOX
-21
-371
-171
-389
+25
+392
+175
+410
 Productivity
 11
 0.0
 1
 
 SLIDER
-16
-390
-196
-423
+20
+411
+200
+444
 firing_quality_threshold
 firing_quality_threshold
 0
 1
-0.2
+0.5
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-16
-431
-198
-464
+20
+452
+202
+485
 unexpected_firing
 unexpected_firing
 0
@@ -503,30 +572,30 @@ NIL
 HORIZONTAL
 
 SLIDER
-14
-310
-227
-343
+18
+331
+231
+364
 unexpected_company_motivation
 unexpected_company_motivation
 0
 1
-0
+0.1
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-242
-312
-445
-345
+246
+333
+449
+366
 unexpected_worker_motivation
 unexpected_worker_motivation
 0
 1
-0
+0.1
 0.1
 1
 NIL
@@ -590,6 +659,36 @@ false
 "" ""
 PENS
 "default" 1.0 2 -16777216 true "" "plotxy unemployement_rate vacancy_rate"
+
+SLIDER
+228
+410
+432
+443
+maximum_productivity_fluctuation
+maximum_productivity_fluctuation
+0
+0.5
+0.2
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+8
+205
+191
+238
+exceptional_event_probability
+exceptional_event_probability
+0
+1
+0.1
+0.1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
