@@ -21,8 +21,13 @@ globals [ ; EN COMMENTAIRES : ceux qui sont définis sur l'interface TODO : chan
   vacancy_level
   vacancy_rate
   convergence
+  last-values-unemployement
+  last-values-vacancy
+  number-of-step-remembered ; nombre de pas pris en compte dans le calcul de la convergence
+  convergence-margin ; marge de movement possibles en dessous de laquelle on considère que le système a convergé
+  
     
-]  ;;
+]  
 breed [persons person]
 breed [companies company]
 breed [matching matching-agent]
@@ -40,12 +45,25 @@ to setup
   clear-all
   
   setup-globals
+  setup-patches
   setup-matching-agent
   setup-persons
   setup-companies
   
   reset-ticks
 end
+
+; procédure d'affichage des différentes LOCATION sur le fond de l'écran de modélisation, par des bandes horizontales
+; TODO peut-être l'améliorer, ça pose problème avec un grand nombre de zones
+to setup-patches
+  ask patches [
+    let size-of-zones round ( (2 * max-pycor + 1) / number_of_locations_possibles )
+    let x floor ((pycor - min-pycor) / size-of-zones)
+    let y remainder x 2
+   if y = 1 [set pcolor 1] 
+  ]
+end
+
 
 ; procédure d'initialisation des variables globales
 to setup-globals
@@ -56,7 +74,11 @@ to setup-globals
   set minimum_similarity_required matching_quality_threshold
   set minimum_productivity_required firing_quality_threshold
   set labor_force number_of_persons ; on considère pour le moment comme agents que les travailleurs dans un système fermé
-  set convergence False;
+  set convergence False
+  set last-values-unemployement []
+  set last-values-vacancy []
+  set number-of-step-remembered 20 ; on calcule la convergence sur les 20 derniers pas de temps
+  set convergence-margin 0.05 ; on fixe la marge à 5% quand les valeurs considérées varient de moins de 5 % sur les 20 derniers pas de temps, on considère que le système a convergé
 end
 
 ; procédure d'initialisation de l'agent MATCHING
@@ -113,7 +135,7 @@ end
 to set-xy
   let x random-pxcor
   let y min-pycor + location * (max-pycor - min-pycor) / number_of_locations_possibles + random (max-pycor - min-pycor)/ number_of_locations_possibles  
-  setxy x + 0.25 y + 0.25
+  setxy x + 0.25 y + 0.25  
 end
 
 
@@ -131,6 +153,7 @@ to go
     update-jobs
   
     compute-values
+    update-convergence
   
   tick
 end
@@ -200,7 +223,7 @@ to-report compute-similarity-person [person company]
   if (random-float 1 < exceptional_event_probability) [
     set similarity similarity + unexpected_worker_motivation
   ]
-  report similarity
+  report min List 1 similarity
 end
 
 ; fonction qui calcule la valeur de la similarité du point de vue de l'entreprise
@@ -216,7 +239,7 @@ to-report compute-similarity-company [person company]
   if (random-float 1 < exceptional_event_probability) [
     set similarity similarity + unexpected_company_motivation
   ]
-  report similarity
+  report min List 1 similarity
 end
 
 ; fonction qui calcule la similarité entre les compétences attendus par l'entreprise et celles possédées par le candidat
@@ -244,10 +267,12 @@ end
 
 ; fonction qui retourne la similarité entre les salaires
 ; renvoie un nombre entre 0 et 1
-; en fonction de l'ordre dans lequel on passe les paramètres, le résultat n'est pas le même (le premier salaire étant la valeur de référence)
-to-report compute-similarity_salary [salary1 salary2]  
-  report 1 - abs (salary1 - salary2) / salary1
-  
+; elle renvoie le même résultat pour les agents PERSON et les agents COMPANY
+; on veut que les salaires soient le plus proche possible : si le salaire proposé est trop élevé par rapport aux attentes de l'employé, c'est mauvais pour la similarité de celui-ci
+to-report compute-similarity_salary [salary1 salary2] 
+  let max_salary max List salary1 salary2
+  let min_salary min List salary1 salary2
+  report (max_salary - min_salary) / max_salary  
 end
 
 
@@ -310,7 +335,7 @@ end
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                            PRINTING CURVES                           ;;
+;;                         COMPUTING PROCEDURES                         ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 to compute-values
@@ -318,7 +343,36 @@ to compute-values
   set vacancy_level count companies with [not job_filled] 
   set unemployement_rate unemployement_level / labor_force
   set vacancy_rate vacancy_level / labor_force
+  updates-last-values
 end
+
+; procédure qui met à jour les lists last-values-unemployement et last-values-vacancy qui gardent en mémoire les 10 dernières valeurs de unemployement_rate et vacancy_rate respectivement
+to updates-last-values
+  ifelse ticks < number-of-step-remembered [
+    set last-values-unemployement lput unemployement_rate last-values-unemployement
+    set last-values-vacancy lput vacancy_rate last-values-vacancy
+  ]
+  [
+    set last-values-unemployement but-first last-values-unemployement
+    set last-values-unemployement lput unemployement_rate last-values-unemployement
+    set last-values-vacancy but-first last-values-vacancy
+    set last-values-vacancy lput vacancy_rate last-values-vacancy
+  ]
+end
+
+; procédure que surveille la convergence d'un système et met à jour la valeur du bolléen CONVERGENCE le cas échéant
+; on surveille l'évolution des valeurs unemployement_rate et vacancy_rate : si elle n'ont pas variée de plus de 5% sur les 10 derniers steps, on considère que le système a convergé
+; évolutions futures : améliorer ce point et rendre cela plus souple
+to update-convergence
+  if ticks > 100 [ ; on laisse un certain temps pour que la convergence se fasse
+    let variation-unemployement (max last-values-unemployement - min last-values-unemployement) / mean last-values-unemployement
+    let variation-vacancy (max last-values-vacancy - min last-values-vacancy) / mean last-values-vacancy
+    if variation-unemployement < convergence-margin and variation-vacancy < convergence-margin [
+      set convergence True;
+    ]
+  ]
+end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 502
@@ -415,7 +469,7 @@ number_of_persons
 number_of_persons
 10
 500
-60
+200
 1
 1
 NIL
@@ -430,7 +484,7 @@ number_of_companies
 number_of_companies
 10
 500
-50
+200
 1
 1
 NIL
@@ -445,7 +499,7 @@ number_of_pairs_considered
 number_of_pairs_considered
 0
 100
-5
+10
 1
 1
 NIL
@@ -460,7 +514,7 @@ minimum_salary
 minimum_salary
 500
 1500
-1500
+500
 1
 1
 NIL
@@ -475,7 +529,7 @@ maximum_salary
 maximum_salary
 2000
 10000
-2153
+3000
 1
 1
 NIL
@@ -580,7 +634,7 @@ unexpected_company_motivation
 unexpected_company_motivation
 0
 1
-0.1
+0
 0.1
 1
 NIL
