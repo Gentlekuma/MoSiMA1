@@ -1,0 +1,58 @@
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                            BEVERIDGE CURVE                           ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to generate-simulations-BC
+ clear-all
+
+  set-current-plot "beveridge_curve"
+  set-current-plot-pen "pen-0"
+  set-plot-pen-mode 2
+
+  show "-------------------------------------------------"
+  show "              Début des simulations"
+  show "-------------------------------------------------"
+  ;; valeurs intiales de U
+  foreach [100 200 300 400] [
+    let initialU ?
+    ;; valeurs intiales de V
+    foreach [100 200 300 400] [
+      let initialV ?
+
+      show "simulation actuelle : u et v sont respectivement :"
+      show initialU
+      show initialV
+      setup-simulations initialU initialV
+      ;while [not convergence or ticks < timeout] [
+      repeat timeout [
+        go
+      ]
+      show "simulation finie : a convergé au bout de :"
+      show ticks
+      show "unemployement_rate vacancy_rate obtenus sont respectivement :"
+      show unemployement_rate
+      show vacancy_rate
+      show "-------------------------------------------------"
+      plotxy unemployement_rate vacancy_rate
+    ]
+  ]
+end
+
+to setup-simulations [initialU initialV]
+
+  clear-turtles
+  clear-patches
+  reset-ticks
+  
+  setup-globals
+  setup-patches
+  setup-matching-agent
+  setup-persons
+  setup-companies
+  
+  set number_of_persons initialU
+  set number_of_companies initialV
+
+
+end
