@@ -30,7 +30,7 @@ to setup-globals
   set convergence False
   set last-values-unemployement []
   set last-values-vacancy []
-  set nb-of-step-remembered 10 ; on calcule la convergence sur les 10 derniers pas de temps
+  set nb-of-step-remembered 100 ; on calcule la convergence sur les 10 derniers pas de temps
   set convergence-margin 0.05 ; on fixe la marge à 5% quand les valeurs considérées varient de moins de 5 % sur les 10 derniers pas de temps, on considère que le système a convergé
 end
 
@@ -83,5 +83,6 @@ end
 
 ; procédure qui fixe la valeur de référence de la productivité de l'employé au hasard selon une loi normale (pour le pas avoir de valeurs trop extrèmes)
 to set-productivity
-  set reference_productivity random-normal 0.8 0.3
+  set reference_productivity random-float 1
 end
+
