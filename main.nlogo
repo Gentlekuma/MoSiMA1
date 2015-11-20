@@ -81,7 +81,7 @@ to go
   update-jobs
 
   compute-values
-  update-convergence
+  compute-convergence
 
   tick
 end
@@ -151,10 +151,10 @@ end
 ; procédure que surveille la convergence d'un système et met à jour la valeur du bolléen CONVERGENCE le cas échéant
 ; on surveille l'évolution des valeurs unemployement_rate et vacancy_rate : si elle n'ont pas variée de plus de 5% sur les 10 derniers steps, on considère que le système a convergé
 ; évolutions futures : améliorer ce point et rendre cela plus souple
-to update-convergence
-  if ticks > 200 [ ; on laisse un certain temps pour que la convergence se fasse
-      let variation-unemployement 0
-      let variation-vacancy 0
+to compute-convergence
+  if ticks > nb-of-step-remembered [ ; on laisse un certain temps pour que la convergence se fasse
+    let variation-unemployement 0
+    let variation-vacancy 0
     if not (mean last-values-unemployement = 0) [
       set variation-unemployement (max last-values-unemployement - min last-values-unemployement) / mean last-values-unemployement
     ]
@@ -163,6 +163,8 @@ to update-convergence
     ]
     if variation-unemployement < convergence-margin and variation-vacancy < convergence-margin [
       set convergence True;
+      show "le système a convergé au tick :"
+      show ticks
     ]
   ]
 end
@@ -436,7 +438,7 @@ HORIZONTAL
 PLOT
 943
 72
-1143
+1299
 222
 unemployement rate
 time
@@ -446,21 +448,11 @@ NIL
 0.0
 1.0
 true
-false
+true
 "" ""
 PENS
 "unemployement_rate" 1.0 0 -14070903 true "" "plot unemployement_rate"
-
-MONITOR
-1159
-72
-1290
-117
-unemployement_rate
-unemployement_rate
-17
-1
-11
+"vacancy_rate" 1.0 0 -955883 true "" "plot vacancy_rate"
 
 SLIDER
 228
@@ -471,7 +463,7 @@ maximum_productivity_fluctuation
 maximum_productivity_fluctuation
 0
 0.5
-0.2
+0
 0.1
 1
 NIL
