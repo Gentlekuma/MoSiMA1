@@ -1,13 +1,4 @@
-__includes[ "setup2.1.nls" "display.nls" "matching_procedures2.1.nls" "job_procedures2.1.nls" "computing.nls" "beveridge.nls"]
-
-to test
- ; let step_U round ((U_max - U_min) / (nb_of_U_points - 1))
- ; show step_U
- ; let list_U n-values nb_of_U_points [step_U * ? + U_min]
-  ;show list_U
-
-end
-
+__includes[ "setup2.1.nls" "display.nls" "matching_procedures2.1.nls" "matching_procedures.nls"  "job_procedures2.1.nls" "job_procedures.nls" "computing.nls" "beveridge.nls"]
 
 globals [
   timeout
@@ -25,7 +16,7 @@ globals [
   min_salary
   max_salary
   nb_of_locations_possibles
-  max_productivity_fluctuation
+  maximum_productivity_fluctuation
   minimum_similarity_required
   minimum_productivity_required
   exceptional_firing
@@ -92,32 +83,24 @@ to go
 
   if ticks >= timeout or convergence [stop]
 
-  agents-matching
-  update-jobs
+  ifelse version = 1
+  [
+    agents-matching
+  ]
+  [
+    ifelse version = 2 [
+      agents-matching-2
+    ]
+    [
+      ;agents-matching 3
+    ]
+  ]
 
+  update-jobs
   compute-values
   compute-convergence
 
   tick
-end
-
-; procédure de matching
-; l'agent MATCHING va considérer à chaque tour au maximum nb_of_pairs_considered et calculer la similarité entre l'entreprise et le candidat et déclencher la procédure d'embauche le cas échéant
-to agents-matching
-  ask matching [
-    let nb_of_matches min (list nb_of_pairs_considered
-                                  count persons with [not employed]
-                                  count companies with [not job_filled])
-    let random-person nobody
-    let random-company nobody
-    repeat nb_of_matches [
-      set random-person one-of persons with [not employed]
-      set random-company one-of companies with [not job_filled]
-      if compare random-person random-company [
-        hiring_procedure random-person random-company
-      ]
-    ]
-  ]
 end
 
 ; procédure qui a chaque tour, décide des productivités des employés et de si ils se font licencier ou non
@@ -131,17 +114,29 @@ to update-jobs
         set productivity productivity - exceptional_firing
       ]
       if productivity < minimum_productivity_required [
-        firing_procedure [employee] of employer employer
+
+        ifelse version = 1
+          [
+            firing_procedure [employee] of employer employer
+          ]
+          [
+            ifelse version = 2 [
+              firing_procedure-2 [employee] of employer employer
+            ]
+            [
+              ;firing_procedure-3 [employee] of employer employer
+            ]
+          ]
       ]
     ]
   ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-456
-10
-925
-500
+437
+58
+906
+548
 25
 25
 9.0
@@ -165,10 +160,10 @@ ticks
 30.0
 
 BUTTON
-8
-28
-77
-61
+426
+10
+495
+43
 setup
 setup
 NIL
@@ -182,10 +177,10 @@ NIL
 1
 
 BUTTON
-146
-28
-213
-61
+564
+10
+631
+43
 go
 go
 T
@@ -199,50 +194,50 @@ NIL
 0
 
 TEXTBOX
-26
-273
-177
-291
-Matching settings
+8
+341
+159
+359
+Matching settings :
 11
 0.0
 0
 
 SLIDER
-17
-106
-199
-139
+3
+32
+185
+65
 number_of_persons
 number_of_persons
 10
 500
-140
+400
 10
 1
 NIL
 HORIZONTAL
 
 SLIDER
-17
-149
-199
-182
+3
+67
+185
+100
 number_of_companies
 number_of_companies
 10
 500
-420
+400
 10
 1
 NIL
 HORIZONTAL
 
 SLIDER
-21
-293
-231
-326
+4
+359
+185
+392
 number_of_pairs_considered
 number_of_pairs_considered
 0
@@ -254,40 +249,40 @@ NIL
 HORIZONTAL
 
 SLIDER
-248
-150
-435
-183
+4
+479
+186
+512
 minimum_salary
 minimum_salary
 500
 1500
 500
-1
+100
 1
 NIL
 HORIZONTAL
 
 SLIDER
-249
-107
-435
-140
+4
+444
+186
+477
 maximum_salary
 maximum_salary
 2000
 10000
 3000
-1
+100
 1
 NIL
 HORIZONTAL
 
 SLIDER
-248
-191
-435
-224
+6
+573
+188
+606
 number_of_locations_possibles
 number_of_locations_possibles
 1
@@ -299,20 +294,20 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-251
-86
-405
-104
-Personal preferences settings
+6
+429
+198
+447
+Agents' personal preferences settings :\n
 11
 0.0
 1
 
 SLIDER
-246
-294
-449
-327
+3
+102
+185
+135
 matching_quality_threshold
 matching_quality_threshold
 0
@@ -324,45 +319,35 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-22
-83
+12
+10
+185
+44
+Original System settings :
+14
+0.0
+1
+
+SLIDER
+3
+137
+185
+170
+firing_quality_threshold
+firing_quality_threshold
+0
+1
+0.5
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+3
 172
-101
-System settings
-11
-0.0
-1
-
-TEXTBOX
-25
-392
-175
-410
-Productivity settings
-11
-0.0
-1
-
-SLIDER
-20
-411
-200
-444
-firing_quality_threshold
-firing_quality_threshold
-0
-1
-0.5
-0.1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-20
-452
-200
-485
+185
+205
 unexpected_firing
 unexpected_firing
 0
@@ -374,10 +359,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-18
-331
-231
-364
+4
+242
+185
+275
 unexpected_company_motivation
 unexpected_company_motivation
 0
@@ -389,10 +374,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-246
-333
-449
-366
+3
+277
+185
+310
 unexpected_worker_motivation
 unexpected_worker_motivation
 0
@@ -404,9 +389,9 @@ NIL
 HORIZONTAL
 
 PLOT
-929
+909
 135
-1181
+1161
 311
 vacancy_rate
 time
@@ -422,25 +407,25 @@ PENS
 "vacancy_rate" 1.0 0 -955883 true "" "plot vacancy_rate"
 
 SLIDER
-228
-410
-432
-443
-maximum_productivity_fluctuation
-maximum_productivity_fluctuation
+3
+207
+185
+240
+max_productivity_fluctuation
+max_productivity_fluctuation
 0
 0.5
-0
+0.3
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-15
-192
-241
-225
+3
+312
+185
+345
 unexpectedl_event_probability
 unexpectedl_event_probability
 0
@@ -452,9 +437,9 @@ NIL
 HORIZONTAL
 
 BUTTON
-926
+909
 10
-1134
+1117
 43
 generate simulations for Beveridge curve
 generate-simulations-BC
@@ -469,9 +454,9 @@ NIL
 1
 
 PLOT
-929
+909
 312
-1429
+1409
 584
 beveridge_curve
 unemployment_rate
@@ -487,10 +472,10 @@ PENS
 "pen-0" 1.0 0 -2674135 true "" ""
 
 SLIDER
-247
-233
-436
-266
+5
+535
+188
+568
 number_of_field_possibles
 number_of_field_possibles
 1
@@ -502,10 +487,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-80
-28
-143
-61
+498
+10
+561
+43
 reset
 reset
 NIL
@@ -519,9 +504,9 @@ NIL
 1
 
 SWITCH
-1399
+1382
 11
-1499
+1482
 44
 display_bc
 display_bc
@@ -530,9 +515,9 @@ display_bc
 -1000
 
 TEXTBOX
-1241
+1224
 10
-1391
+1374
 52
 Turns on or off display while computing the Beveridge curve to speed up the process :
 11
@@ -540,39 +525,39 @@ Turns on or off display while computing the Beveridge curve to speed up the proc
 1
 
 SLIDER
-930
+910
 67
-1102
+1082
 100
 nb_of_U_points
 nb_of_U_points
 0
 100
-11
+4
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-930
+910
 101
-1102
+1082
 134
 nb_of_V_points
 nb_of_V_points
 0
 100
-11
+4
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-1103
+1083
 67
-1275
+1255
 100
 U_min
 U_min
@@ -585,24 +570,24 @@ NIL
 HORIZONTAL
 
 SLIDER
-1276
+1256
 67
-1448
+1428
 100
 U_max
 U_max
 10
 1000
-500
+400
 10
 1
 NIL
 HORIZONTAL
 
 SLIDER
-1103
+1083
 101
-1275
+1255
 134
 V_min
 V_min
@@ -615,41 +600,24 @@ NIL
 HORIZONTAL
 
 SLIDER
-1276
+1256
 101
-1448
+1428
 134
 V_max
 V_max
 10
 1000
-500
+400
 10
 1
 NIL
 HORIZONTAL
-
-BUTTON
-278
-46
-341
-79
-test
-test
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
 
 PLOT
-1182
+1162
 135
-1429
+1409
 311
 unemployement_rate
 NIL
@@ -665,25 +633,90 @@ PENS
 "default" 1.0 0 -13345367 true "" "plot unemployement_rate"
 
 TEXTBOX
-935
-50
-1228
-78
+915
+46
+1208
+64
 Parameters for the Beveridge curve :
 11
 0.0
 1
 
 SWITCH
-1137
+1120
 10
-1236
+1219
 43
 stop_comp
 stop_comp
 1
 1
 -1000
+
+TEXTBOX
+194
+42
+209
+60
+U
+11
+0.0
+1
+
+TEXTBOX
+194
+76
+209
+94
+V
+11
+0.0
+1
+
+SLIDER
+3
+394
+185
+427
+exceptional_matching
+exceptional_matching
+0
+100
+50
+1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+191
+402
+341
+420
+Unused ? (also, range?)\n
+11
+15.0
+1
+
+CHOOSER
+634
+10
+726
+55
+version
+version
+1 2
+1
+
+TEXTBOX
+16
+516
+151
+534
+Additional parameters
+14
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

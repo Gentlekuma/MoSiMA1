@@ -2,6 +2,25 @@
 ;;                         MATCHING PROCEDURES                          ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; procédure de matching
+; l'agent MATCHING va considérer à chaque tour au maximum nb_of_pairs_considered et calculer la similarité entre l'entreprise et le candidat et déclencher la procédure d'embauche le cas échéant
+to agents-matching
+  ask matching [
+    let nb_of_matches min (list nb_of_pairs_considered
+                                  count persons with [not employed]
+                                  count companies with [not job_filled])
+    let random-person nobody
+    let random-company nobody
+    repeat nb_of_matches [
+      set random-person one-of persons with [not employed]
+      set random-company one-of companies with [not job_filled]
+      if compare random-person random-company [
+        hiring_procedure random-person random-company
+      ]
+    ]
+  ]
+end
+
 ; fonction qui se charge de comparer les exigences d'une PERSON et d'une COMPANY
 ; renvoie un bolléen : si les 2 agents se correspondent ou pas
 to-report compare [person company]
