@@ -65,8 +65,13 @@ to setup
   reset-ticks
 end
 
-
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                     RESET TO DEFAULT PARAMETERS                      ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+to reset
+  reset-globals
+  setup
+end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                 GO                                   ;;
@@ -88,7 +93,7 @@ to go
 end
 
 ; procédure de matching
-; l'agent MATCHING va considérer à chaque tour au maximum nb_of_pairs_considered et calculer la similarité entre l'entreprise et le condidat et déclencher la procédure d'embauche le cas échéant
+; l'agent MATCHING va considérer à chaque tour au maximum nb_of_pairs_considered et calculer la similarité entre l'entreprise et le candidat et déclencher la procédure d'embauche le cas échéant
 to agents-matching
   ask matching [
     let nb_of_matches min (list nb_of_pairs_considered
@@ -106,7 +111,7 @@ to agents-matching
   ]
 end
 
-; procédure qui a chaque tour, décide des productivité des employé et de si ils se font licencier ou non
+; procédure qui a chaque tour, décide des productivités des employés et de si ils se font licencier ou non
 ; on considère le paramètre exceptional_firing comme une augmentation des attentes de l'employeur qui a une probabilité d'arriver de exceptional_event_probability
 to update-jobs
   ask persons [
@@ -122,7 +127,6 @@ to update-jobs
     ]
   ]
 end
-
 
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -170,9 +174,9 @@ NIL
 1
 
 BUTTON
-90
+146
 28
-157
+213
 61
 go
 go
@@ -489,6 +493,23 @@ number_of_field_possibles
 1
 NIL
 HORIZONTAL
+
+BUTTON
+80
+28
+143
+61
+reset
+reset
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

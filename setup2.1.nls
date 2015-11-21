@@ -106,3 +106,21 @@ end
 to set-initial-specialization
   set specialization n-values nb_of_field_possibles [0]
 end
+
+; to set globals to default values
+to reset-globals
+  set number_of_persons 400
+  set number_of_companies 400
+  set number_of_pairs_considered 30
+  set number_of_locations_possibles 3
+  set minimum_salary 500
+  set maximum_salary 3000
+  set matching_quality_threshold 0.5
+  set firing_quality_threshold 0.5
+  set unexpected_firing 0.1
+  set unexpected_company_motivation 0.1
+  set unexpected_worker_motivation 0.1
+  set unexpectedl_event_probability 0.05
+  set number_of_field_possibles 5
+end
+
