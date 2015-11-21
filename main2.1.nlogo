@@ -133,9 +133,9 @@ to update-jobs
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-437
+206
 58
-906
+675
 548
 25
 25
@@ -160,9 +160,9 @@ ticks
 30.0
 
 BUTTON
-426
+207
 10
-495
+276
 43
 setup
 setup
@@ -177,9 +177,9 @@ NIL
 1
 
 BUTTON
-564
+345
 10
-631
+412
 43
 go
 go
@@ -194,34 +194,34 @@ NIL
 0
 
 TEXTBOX
-8
-341
-159
-359
+10
+311
+161
+329
 Matching settings :
 11
 0.0
 0
 
 SLIDER
-3
+5
 32
-185
+187
 65
 number_of_persons
 number_of_persons
 10
 500
-400
+100
 10
 1
 NIL
 HORIZONTAL
 
 SLIDER
-3
+5
 67
-185
+187
 100
 number_of_companies
 number_of_companies
@@ -234,10 +234,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-4
-359
-185
-392
+6
+329
+187
+362
 number_of_pairs_considered
 number_of_pairs_considered
 0
@@ -249,10 +249,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-4
-479
-186
-512
+6
+483
+188
+516
 minimum_salary
 minimum_salary
 500
@@ -264,10 +264,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-4
-444
-186
-477
+6
+448
+188
+481
 maximum_salary
 maximum_salary
 2000
@@ -279,10 +279,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-6
-573
-188
-606
+8
+577
+190
+610
 number_of_locations_possibles
 number_of_locations_possibles
 1
@@ -294,20 +294,20 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-6
-429
-198
-447
+-2
+433
+190
+451
 Agents' personal preferences settings :\n
 11
 0.0
 1
 
 SLIDER
-3
-102
-185
-135
+5
+399
+187
+432
 matching_quality_threshold
 matching_quality_threshold
 0
@@ -319,9 +319,9 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-12
+14
 10
-185
+187
 44
 Original System settings :
 14
@@ -329,10 +329,10 @@ Original System settings :
 1
 
 SLIDER
-3
-137
-185
-170
+5
+103
+187
+136
 firing_quality_threshold
 firing_quality_threshold
 0
@@ -344,10 +344,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-3
+5
+139
+187
 172
-185
-205
 unexpected_firing
 unexpected_firing
 0
@@ -359,10 +359,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-4
+6
+209
+187
 242
-185
-275
 unexpected_company_motivation
 unexpected_company_motivation
 0
@@ -374,10 +374,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-3
+5
+244
+187
 277
-185
-310
 unexpected_worker_motivation
 unexpected_worker_motivation
 0
@@ -389,9 +389,9 @@ NIL
 HORIZONTAL
 
 PLOT
-909
+678
 135
-1161
+930
 311
 vacancy_rate
 time
@@ -407,10 +407,10 @@ PENS
 "vacancy_rate" 1.0 0 -955883 true "" "plot vacancy_rate"
 
 SLIDER
-3
+5
+174
+187
 207
-185
-240
 max_productivity_fluctuation
 max_productivity_fluctuation
 0
@@ -422,10 +422,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-3
+5
+279
+187
 312
-185
-345
 unexpectedl_event_probability
 unexpectedl_event_probability
 0
@@ -437,9 +437,9 @@ NIL
 HORIZONTAL
 
 BUTTON
-909
+678
 10
-1117
+886
 43
 generate simulations for Beveridge curve
 generate-simulations-BC
@@ -454,9 +454,9 @@ NIL
 1
 
 PLOT
-909
+678
 312
-1409
+1178
 584
 beveridge_curve
 unemployment_rate
@@ -472,10 +472,10 @@ PENS
 "pen-0" 1.0 0 -2674135 true "" ""
 
 SLIDER
-5
-535
-188
-568
+7
+539
+190
+572
 number_of_field_possibles
 number_of_field_possibles
 1
@@ -487,9 +487,9 @@ NIL
 HORIZONTAL
 
 BUTTON
-498
+279
 10
-561
+342
 43
 reset
 reset
@@ -504,9 +504,9 @@ NIL
 1
 
 SWITCH
-1382
+1151
 11
-1482
+1251
 44
 display_bc
 display_bc
@@ -515,9 +515,9 @@ display_bc
 -1000
 
 TEXTBOX
-1224
+993
 10
-1374
+1143
 52
 Turns on or off display while computing the Beveridge curve to speed up the process :
 11
@@ -525,9 +525,9 @@ Turns on or off display while computing the Beveridge curve to speed up the proc
 1
 
 SLIDER
-910
+679
 67
-1082
+851
 100
 nb_of_U_points
 nb_of_U_points
@@ -540,9 +540,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-910
+679
 101
-1082
+851
 134
 nb_of_V_points
 nb_of_V_points
@@ -555,9 +555,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-1083
+852
 67
-1255
+1024
 100
 U_min
 U_min
@@ -570,9 +570,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-1256
+1025
 67
-1428
+1197
 100
 U_max
 U_max
@@ -585,9 +585,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-1083
+852
 101
-1255
+1024
 134
 V_min
 V_min
@@ -600,9 +600,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-1256
+1025
 101
-1428
+1197
 134
 V_max
 V_max
@@ -615,9 +615,9 @@ NIL
 HORIZONTAL
 
 PLOT
-1162
+931
 135
-1409
+1178
 311
 unemployement_rate
 NIL
@@ -633,9 +633,9 @@ PENS
 "default" 1.0 0 -13345367 true "" "plot unemployement_rate"
 
 TEXTBOX
-915
+684
 46
-1208
+977
 64
 Parameters for the Beveridge curve :
 11
@@ -643,20 +643,20 @@ Parameters for the Beveridge curve :
 1
 
 SWITCH
-1120
+889
 10
-1219
+988
 43
 stop_comp
 stop_comp
-1
+0
 1
 -1000
 
 TEXTBOX
-194
+190
 42
-209
+205
 60
 U
 11
@@ -664,56 +664,56 @@ U
 1
 
 TEXTBOX
-194
-76
-209
-94
+190
+80
+205
+98
 V
 11
 0.0
 1
 
 SLIDER
-3
-394
-185
-427
+5
+364
+187
+397
 exceptional_matching
 exceptional_matching
 0
-100
-50
 1
+0.3
+0.05
 1
 NIL
 HORIZONTAL
 
 TEXTBOX
-191
-402
-341
-420
+73
+382
+254
+400
 Unused ? (also, range?)\n
 11
 15.0
 1
 
 CHOOSER
-634
+415
 10
-726
+507
 55
 version
 version
 1 2
-1
+0
 
 TEXTBOX
-16
-516
-151
-534
-Additional parameters
+18
+520
+153
+554
+Additional parameters :
 14
 0.0
 1
