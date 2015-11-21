@@ -1,22 +1,57 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                             PRODUCTIVITY                             ;;
+;;                      UPDATING JOBS AND PRODUCTIVITY                  ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; fonction qui calcule la productivité d'une PERSON à chaque tour, en se basant sur la valeur de référence, propre à chaque agent
-; renvoie un nombre entre 0 et 1
-; il s'agit d'une valeur comprise entre + ou - max_productivity_fluctuation de la valeur de référence de productivité de l'agent
-to-report compute-productivity
-  let productivity reference_productivity - maximum_productivity_fluctuation + random-float ( 2 * maximum_productivity_fluctuation * reference_productivity)
-  if productivity < 0 [
-    set productivity 0
+; fonction qui calcule la productivité d'une PERSON à chaque tour
+to-report compute-productivity   
+  
+  let temp productivity + (random-float (2) - 1) * maximum_productivity_fluctuation
+  ifelse temp > 1[
+    report 1
   ]
-  if productivity > 1 [
-    set productivity 1
+  [
+    report temp
   ]
-  report productivity
+
+
+  ;let productivity reference_productivity - maximum_productivity_fluctuation + random-float ( 2 * maximum_productivity_fluctuation * reference_productivity)
+  ;if productivity < 0 [
+  ;  set productivity 0
+  ;]
+  ;if productivity > 1 [
+  ;  set productivity 1
+  ;]
+  ;report productivity
 end
 
 
+; procédure qui a chaque tour, décide des productivités des employés et de si ils se font licencier ou non
+; on considère le paramètre exceptional_firing comme une augmentation des attentes de l'employeur qui a une probabilité d'arriver de exceptional_event_probability
+to update-jobs
+  ask persons [
+    if employed [
+      set experience experience + 1
+      set productivity compute-productivity
+
+      if ( (random-float 1 <= exceptional_firing) or (productivity < minimum_productivity_required) ) 
+      [
+        ifelse version = 1
+          [
+            firing_procedure [employee] of employer employer
+          ]
+          [
+            ifelse version = 2 
+            [
+              firing_procedure-2 [employee] of employer employer
+            ]
+            [
+              ;firing_procedure-3 [employee] of employer employer
+            ]
+          ]
+      ]
+    ]
+  ]
+end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                     HIRING AND FIRING PROCEDURES                     ;;
@@ -24,17 +59,20 @@ end
 
 ; procédure d'embauche
 ; on met à jour les attributs des agents
-to hiring_procedure [person company]
+to hiring_procedure [person company similarity]
   ask person [
     set color color-person-employed
     set employed True
     set employer company
+    set productivity 1
+    set strong-matching similarity > strong-matching-treshold
     create-link-with company
   ]
   ask company [
     set color color-company-filled-job
     set job_filled True
     set employee person
+    set strong-matching similarity > strong-matching-treshold
   ]
 end
 

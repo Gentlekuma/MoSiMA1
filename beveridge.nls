@@ -16,7 +16,7 @@ to generate-simulations-BC
   let step_V round ((V_max - V_min) / (nb_of_V_points - 1))
   let list_V n-values nb_of_V_points [step_V * ? + V_min]
 
- 
+  set stop_comp FALSE
   
   ;show "-------------------------------------------------"
   ;show "              Début des simulations"
@@ -68,7 +68,6 @@ to setup-simulations [initialU initialV]
   setup-persons
   setup-companies
   
-  set stop_comp FALSE
   set number_of_persons initialU
   set number_of_companies initialV
 

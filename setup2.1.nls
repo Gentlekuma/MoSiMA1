@@ -7,7 +7,7 @@ to setup-globals
   ; variables fixées par les sliders :
   set nb_of_persons number_of_persons
   set nb_of_companies number_of_companies
-  set nb_of_pairs_considered number_of_pairs_considered
+  set nb_of_pairs_considered round ( (number_of_pairs_considered / 100 ) * (nb_of_persons + nb_of_companies) )
   set nb_of_locations_possibles number_of_locations_possibles
   set min_salary minimum_salary
   set max_salary maximum_salary
@@ -16,9 +16,10 @@ to setup-globals
   set exceptional_firing unexpected_firing
   set exceptional_company_motivation unexpected_company_motivation
   set exceptional_worker_motivation unexpected_worker_motivation
-  set exceptional_event_proba unexpectedl_event_probability
   set nb_of_field_possibles number_of_field_possibles
   set maximum_productivity_fluctuation max_productivity_fluctuation
+  set exceptional_motivation_event except_motivation_chance
+  set strong-matching-treshold exceptional_matching
   ; autres variables 
   set timeout 1000
   
@@ -31,7 +32,7 @@ to setup-globals
   set convergence False
   set last-values-unemployement []
   set last-values-vacancy []
-  set nb-of-step-remembered 100 ; on calcule la convergence sur les 10 derniers pas de temps
+  set nb-of-step-remembered 100 ; nombres de resultats stockés pour le calcul de la convergence
   set convergence-margin 0.05 ; on fixe la marge à 5% quand les valeurs considérées varient de moins de 5 % sur les 10 derniers pas de temps, on considère que le système a convergé
 end
 
@@ -88,13 +89,13 @@ end
 
 ; procédure qui fixe la valeur de référence de la productivité de l'employé au hasard selon une loi normale (pour le pas avoir de valeurs trop extrèmes)
 to set-productivity
-  set reference_productivity random-normal 0.7 0.3
-  if reference_productivity < 0 [
-    set reference_productivity 0
-  ]
-  if reference_productivity > 1 [
-    set reference_productivity 1
-  ]
+  ;set reference_productivity random-normal 0.7 0.3
+  ;if reference_productivity < 0 [
+  ;  set reference_productivity 0
+  ;]
+  ;if reference_productivity > 1 [
+  ;  set reference_productivity 1
+  ;]
 end
 
 ; procédure qui fixe le domaine de l'entreprise
@@ -120,7 +121,6 @@ to reset-globals
   set unexpected_firing 0.1
   set unexpected_company_motivation 0.1
   set unexpected_worker_motivation 0.1
-  set unexpectedl_event_probability 0.05
   set max_productivity_fluctuation 0.3
   set number_of_field_possibles 5
   set display_bc false
@@ -130,5 +130,9 @@ to reset-globals
   set V_min 100
   set U_max 400
   set V_max 400
+  set except_motivation_chance 0.1
+  set exceptional_matching 0.7
+  set timeout 1000
+  set converge-criteria 0.05
 end
 

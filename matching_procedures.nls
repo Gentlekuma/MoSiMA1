@@ -14,20 +14,22 @@ to agents-matching
     repeat nb_of_matches [
       set random-person one-of persons with [not employed]
       set random-company one-of companies with [not job_filled]
-      if compare random-person random-company [
-        hiring_procedure random-person random-company
+      let similarity compute-similarity-value random-person random-company
+      if similarity >= minimum_similarity_required [
+        hiring_procedure random-person random-company similarity
       ]
     ]
   ]
 end
 
+
 ; fonction qui se charge de comparer les exigences d'une PERSON et d'une COMPANY
-; renvoie un bolléen : si les 2 agents se correspondent ou pas
-to-report compare [person company]
+; renvoie la valeur aggrégée de la similarity
+to-report compute-similarity-value [person company]
   let similarity-person compute-similarity-person person company
   let similarity-company compute-similarity-company person company
   let similarity mean List similarity-person similarity-company
-  report similarity >= minimum_similarity_required
+  report similarity
 end
 
 ; fonction qui calcule la valeur de la similarité du point de vue de l'employé
@@ -40,7 +42,7 @@ to-report compute-similarity-person [person company]
   let similarity_location compute-similarity_location [location] of person [location] of company
   let similarity_salary compute-similarity_salary [salary] of person [salary] of company
   let similarity (similarity_skills + similarity_location + similarity_salary) / 3
-  if (random-float 1 < exceptional_event_proba) [
+  if (random-float 1 < exceptional_motivation_event) [
     set similarity similarity + exceptional_worker_motivation
   ]
   report min List 1 similarity
@@ -56,7 +58,7 @@ to-report compute-similarity-company [person company]
   let similarity_location compute-similarity_location [location] of company [location] of person
   let similarity_salary compute-similarity_salary [salary] of company [salary] of person
   let similarity (similarity_skills + similarity_location + similarity_salary) / 3
-  if (random-float 1 < exceptional_event_proba) [
+  if (random-float 1 < exceptional_motivation_event) [
     set similarity similarity + exceptional_company_motivation
   ]
   report min List 1 similarity

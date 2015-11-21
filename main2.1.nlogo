@@ -1,7 +1,6 @@
 __includes[ "setup2.1.nls" "display.nls" "matching_procedures2.1.nls" "matching_procedures.nls"  "job_procedures2.1.nls" "job_procedures.nls" "computing.nls" "beveridge.nls"]
 
 globals [
-  timeout
 
   ; affichage
   color-person-employed
@@ -22,8 +21,9 @@ globals [
   exceptional_firing
   exceptional_company_motivation
   exceptional_worker_motivation
-  exceptional_event_proba
   nb_of_field_possibles
+  exceptional_motivation_event ; to reste
+  strong-matching-treshold ; to reset
 
   ; mesures
   labor_force
@@ -31,8 +31,9 @@ globals [
   unemployement_rate
   vacancy_level
   vacancy_rate
+  moving-average
 
-  ; variable pour la convergence
+  ; variables pour la convergence
   convergence
   last-values-unemployement
   last-values-vacancy
@@ -44,8 +45,8 @@ breed [persons person]
 breed [companies company]
 breed [matching matching-agent]
 
-persons-own [skills location salary reference_productivity employed employer experience specialization]
-companies-own [skills location salary job_filled employee experience_required field]
+persons-own [skills location salary productivity employed employer experience specialization strong-matching]
+companies-own [skills location salary job_filled employee experience_required field strong-matching]
 
 
 
@@ -99,44 +100,16 @@ to go
   update-jobs
   compute-values
   compute-convergence
+  stock-last-values
 
   tick
 end
-
-; procédure qui a chaque tour, décide des productivités des employés et de si ils se font licencier ou non
-; on considère le paramètre exceptional_firing comme une augmentation des attentes de l'employeur qui a une probabilité d'arriver de exceptional_event_probability
-to update-jobs
-  ask persons [
-    if employed [
-      set experience experience + 1
-      let productivity compute-productivity
-      if ( random-float 1 < exceptional_event_proba) [
-        set productivity productivity - exceptional_firing
-      ]
-      if productivity < minimum_productivity_required [
-
-        ifelse version = 1
-          [
-            firing_procedure [employee] of employer employer
-          ]
-          [
-            ifelse version = 2 [
-              firing_procedure-2 [employee] of employer employer
-            ]
-            [
-              ;firing_procedure-3 [employee] of employer employer
-            ]
-          ]
-      ]
-    ]
-  ]
-end
 @#$#@#$#@
 GRAPHICS-WINDOW
-206
-58
-675
-548
+241
+83
+710
+573
 25
 25
 9.0
@@ -160,9 +133,9 @@ ticks
 30.0
 
 BUTTON
-207
+242
 10
-276
+311
 43
 setup
 setup
@@ -177,9 +150,9 @@ NIL
 1
 
 BUTTON
-345
+380
 10
-412
+447
 43
 go
 go
@@ -194,10 +167,10 @@ NIL
 0
 
 TEXTBOX
-10
-311
-161
-329
+11
+368
+162
+386
 Matching settings :
 11
 0.0
@@ -212,7 +185,7 @@ number_of_persons
 number_of_persons
 10
 500
-100
+400
 10
 1
 NIL
@@ -234,10 +207,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-6
-329
-187
-362
+7
+520
+189
+553
 number_of_pairs_considered
 number_of_pairs_considered
 0
@@ -245,14 +218,14 @@ number_of_pairs_considered
 30
 1
 1
-NIL
+(percentage of U+V)
 HORIZONTAL
 
 SLIDER
 6
-483
+333
 188
-516
+366
 minimum_salary
 minimum_salary
 500
@@ -265,9 +238,9 @@ HORIZONTAL
 
 SLIDER
 6
-448
+298
 188
-481
+331
 maximum_salary
 maximum_salary
 2000
@@ -279,10 +252,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-577
-190
-610
+9
+609
+191
+642
 number_of_locations_possibles
 number_of_locations_possibles
 1
@@ -294,20 +267,20 @@ NIL
 HORIZONTAL
 
 TEXTBOX
--2
-433
-190
-451
+8
+283
+200
+301
 Agents' personal preferences settings :\n
 11
 0.0
 1
 
 SLIDER
-5
-399
-187
-432
+7
+419
+189
+452
 matching_quality_threshold
 matching_quality_threshold
 0
@@ -389,9 +362,9 @@ NIL
 HORIZONTAL
 
 PLOT
-678
+718
 135
-930
+970
 311
 vacancy_rate
 time
@@ -421,25 +394,10 @@ max_productivity_fluctuation
 NIL
 HORIZONTAL
 
-SLIDER
-5
-279
-187
-312
-unexpectedl_event_probability
-unexpectedl_event_probability
-0
-1
-0.05
-0.05
-1
-NIL
-HORIZONTAL
-
 BUTTON
-678
+718
 10
-886
+926
 43
 generate simulations for Beveridge curve
 generate-simulations-BC
@@ -454,28 +412,28 @@ NIL
 1
 
 PLOT
-678
+718
 312
-1178
+1218
 584
 beveridge_curve
 unemployment_rate
 vacancy_rate
-0.0
+0.5
 1.0
 0.0
-1.0
-false
+3.0
+true
 false
 "" ""
 PENS
 "pen-0" 1.0 0 -2674135 true "" ""
 
 SLIDER
-7
-539
-190
-572
+8
+571
+191
+604
 number_of_field_possibles
 number_of_field_possibles
 1
@@ -487,9 +445,9 @@ NIL
 HORIZONTAL
 
 BUTTON
-279
+314
 10
-342
+377
 43
 reset
 reset
@@ -504,9 +462,9 @@ NIL
 1
 
 SWITCH
-1151
+1310
 11
-1251
+1410
 44
 display_bc
 display_bc
@@ -515,9 +473,9 @@ display_bc
 -1000
 
 TEXTBOX
-993
+1152
 10
-1143
+1302
 52
 Turns on or off display while computing the Beveridge curve to speed up the process :
 11
@@ -525,13 +483,13 @@ Turns on or off display while computing the Beveridge curve to speed up the proc
 1
 
 SLIDER
-679
+719
 67
-851
+891
 100
 nb_of_U_points
 nb_of_U_points
-0
+2
 100
 4
 1
@@ -540,13 +498,13 @@ NIL
 HORIZONTAL
 
 SLIDER
-679
+719
 101
-851
+891
 134
 nb_of_V_points
 nb_of_V_points
-0
+2
 100
 4
 1
@@ -555,9 +513,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-852
+892
 67
-1024
+1064
 100
 U_min
 U_min
@@ -570,13 +528,13 @@ NIL
 HORIZONTAL
 
 SLIDER
-1025
+1065
 67
-1197
+1237
 100
 U_max
 U_max
-10
+U_min
 1000
 400
 10
@@ -585,9 +543,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-852
+892
 101
-1024
+1064
 134
 V_min
 V_min
@@ -600,42 +558,24 @@ NIL
 HORIZONTAL
 
 SLIDER
-1025
+1065
 101
-1197
+1237
 134
 V_max
 V_max
-10
+V_min
 1000
 400
 10
 1
 NIL
 HORIZONTAL
-
-PLOT
-931
-135
-1178
-311
-unemployement_rate
-NIL
-NIL
-0.0
-1.0
-0.0
-1.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -13345367 true "" "plot unemployement_rate"
 
 TEXTBOX
-684
+724
 46
-977
+1017
 64
 Parameters for the Beveridge curve :
 11
@@ -643,13 +583,13 @@ Parameters for the Beveridge curve :
 1
 
 SWITCH
-889
-10
-988
-43
+1040
+11
+1139
+44
 stop_comp
 stop_comp
-0
+1
 1
 -1000
 
@@ -674,34 +614,24 @@ V
 1
 
 SLIDER
-5
-364
-187
-397
+7
+384
+189
+417
 exceptional_matching
 exceptional_matching
 0
 1
-0.3
+0.7
 0.05
 1
 NIL
 HORIZONTAL
 
-TEXTBOX
-73
-382
-254
-400
-Unused ? (also, range?)\n
-11
-15.0
-1
-
 CHOOSER
-415
+450
 10
-507
+542
 55
 version
 version
@@ -709,12 +639,88 @@ version
 0
 
 TEXTBOX
-18
-520
-153
-554
+19
+552
+169
+586
 Additional parameters :
 14
+0.0
+1
+
+SLIDER
+7
+454
+189
+487
+except_motivation_chance
+except_motivation_chance
+0
+1
+0.1
+0.05
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+946
+12
+1045
+40
+Click to cancel the BC computation :
+11
+0.0
+1
+
+SLIDER
+544
+10
+717
+43
+timeout
+timeout
+500
+10000
+1000
+100
+1
+NIL
+HORIZONTAL
+
+MONITOR
+971
+135
+1130
+180
+average U from last steps
+moving-average
+5
+1
+11
+
+SLIDER
+544
+44
+717
+77
+converge-criteria
+converge-criteria
+0
+1
+0.05
+0.05
+1
+percents
+HORIZONTAL
+
+TEXTBOX
+8
+491
+185
+518
+Percentage of U+V of pairs for the matching procedure at each tick :
+11
 0.0
 1
 

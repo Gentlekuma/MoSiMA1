@@ -41,7 +41,7 @@ to-report compute-similarity-person-2 [person company]
   let similarity_field compute-similarity_field [field] of company [specialization] of person
   
   let similarity (similarity_skills + similarity_location + similarity_salary + similarity_field) / 3
-  if (random-float 1 < exceptional_event_proba) [
+  if (random-float 1 < exceptional_worker_motivation) [
     set similarity similarity + exceptional_worker_motivation
   ]
   report min List 1 similarity
@@ -60,7 +60,7 @@ to-report compute-similarity-company-2 [person company]
   let similarity_experience compute-similarity_expérience [experience] of person [experience_required] of company
   
   let similarity (similarity_skills + similarity_location + similarity_salary + similarity_field + similarity_experience) / 5
-  if (random-float 1 < exceptional_event_proba) [
+  if (random-float 1 < exceptional_company_motivation) [
     set similarity similarity + exceptional_company_motivation
   ]
   report min List 1 similarity
