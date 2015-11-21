@@ -1,5 +1,14 @@
 __includes[ "setup2.1.nls" "display.nls" "matching_procedures2.1.nls" "job_procedures2.1.nls" "computing.nls" "beveridge.nls"]
 
+to test
+ ; let step_U round ((U_max - U_min) / (nb_of_U_points - 1))
+ ; show step_U
+ ; let list_U n-values nb_of_U_points [step_U * ? + U_min]
+  ;show list_U
+
+end
+
+
 globals [
   timeout
 
@@ -127,7 +136,6 @@ to update-jobs
     ]
   ]
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 456
@@ -209,7 +217,7 @@ number_of_persons
 number_of_persons
 10
 500
-400
+140
 10
 1
 NIL
@@ -224,7 +232,7 @@ number_of_companies
 number_of_companies
 10
 500
-400
+420
 10
 1
 NIL
@@ -396,11 +404,11 @@ NIL
 HORIZONTAL
 
 PLOT
-943
-72
-1299
-222
-unemployement rate
+929
+135
+1181
+311
+vacancy_rate
 time
 NIL
 0.0
@@ -408,10 +416,9 @@ NIL
 0.0
 1.0
 true
-true
+false
 "" ""
 PENS
-"unemployement_rate" 1.0 0 -14070903 true "" "plot unemployement_rate"
 "vacancy_rate" 1.0 0 -955883 true "" "plot vacancy_rate"
 
 SLIDER
@@ -445,10 +452,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-982
-17
-1240
-50
+926
+10
+1134
+43
 generate simulations for Beveridge curve
 generate-simulations-BC
 NIL
@@ -462,10 +469,10 @@ NIL
 1
 
 PLOT
-958
-232
-1272
-476
+929
+312
+1429
+584
 beveridge_curve
 unemployment_rate
 vacancy_rate
@@ -473,11 +480,11 @@ vacancy_rate
 1.0
 0.0
 1.0
-true
+false
 false
 "" ""
 PENS
-"pen-0" 1.0 0 -16777216 true "" ""
+"pen-0" 1.0 0 -2674135 true "" ""
 
 SLIDER
 247
@@ -510,6 +517,173 @@ NIL
 NIL
 NIL
 1
+
+SWITCH
+1399
+11
+1499
+44
+display_bc
+display_bc
+1
+1
+-1000
+
+TEXTBOX
+1241
+10
+1391
+52
+Turns on or off display while computing the Beveridge curve to speed up the process :
+11
+0.0
+1
+
+SLIDER
+930
+67
+1102
+100
+nb_of_U_points
+nb_of_U_points
+0
+100
+11
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+930
+101
+1102
+134
+nb_of_V_points
+nb_of_V_points
+0
+100
+11
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1103
+67
+1275
+100
+U_min
+U_min
+10
+1000
+100
+10
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1276
+67
+1448
+100
+U_max
+U_max
+10
+1000
+500
+10
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1103
+101
+1275
+134
+V_min
+V_min
+10
+1000
+100
+10
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1276
+101
+1448
+134
+V_max
+V_max
+10
+1000
+500
+10
+1
+NIL
+HORIZONTAL
+
+BUTTON
+278
+46
+341
+79
+test
+test
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+PLOT
+1182
+135
+1429
+311
+unemployement_rate
+NIL
+NIL
+0.0
+1.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -13345367 true "" "plot unemployement_rate"
+
+TEXTBOX
+935
+50
+1228
+78
+Parameters for the Beveridge curve :
+11
+0.0
+1
+
+SWITCH
+1137
+10
+1236
+43
+stop_comp
+stop_comp
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?

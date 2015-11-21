@@ -122,5 +122,12 @@ to reset-globals
   set unexpected_worker_motivation 0.1
   set unexpectedl_event_probability 0.05
   set number_of_field_possibles 5
+  set display_bc false
+  set nb_of_U_points 11
+  set nb_of_V_points 11
+  set U_min 100
+  set V_min 100
+  set U_max 500
+  set V_max 500
 end
 

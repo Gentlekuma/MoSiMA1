@@ -4,39 +4,56 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 to generate-simulations-BC
- clear-all
-
+  clear-all
+  
   set-current-plot "beveridge_curve"
   set-current-plot-pen "pen-0"
   set-plot-pen-mode 2
+ 
+  let step_U round ((U_max - U_min) / (nb_of_U_points - 1))
+  let list_U n-values nb_of_U_points [step_U * ? + U_min]
+  
+  let step_V round ((V_max - V_min) / (nb_of_V_points - 1))
+  let list_V n-values nb_of_V_points [step_V * ? + V_min]
 
-  show "-------------------------------------------------"
-  show "              Début des simulations"
-  show "-------------------------------------------------"
-  ;; valeurs intiales de U
-  foreach [100 200 300 400] [
+ 
+  
+  ;show "-------------------------------------------------"
+  ;show "              Début des simulations"
+  ;show "-------------------------------------------------"
+
+  if not display_bc [
+    no-display
+  ]
+  
+  foreach list_U [
     let initialU ?
-    ;; valeurs intiales de V
-    foreach [100 200 300 400] [
+    foreach list_V [
       let initialV ?
-
-      show "simulation actuelle : u et v sont respectivement :"
-      show initialU
-      show initialV
+    
       setup-simulations initialU initialV
-      ;while [not convergence or ticks < timeout] [
+      
+      type "at step U = " type initialU type " and V = " type initialV type "\n"
+  
       repeat timeout [
+        if stop_comp[
+          display
+          stop
+        ]
         go
       ]
-      show "simulation finie : a convergé au bout de :"
-      show ticks
-      show "unemployement_rate vacancy_rate obtenus sont respectivement :"
-      show unemployement_rate
-      show vacancy_rate
-      show "-------------------------------------------------"
+      
+      ;show "simulation finie : a convergé au bout de :"
+      ;show ticks
+      ;show "unemployement_rate vacancy_rate obtenus sont respectivement :"
+      ;show unemployement_rate
+      ;show vacancy_rate
+      ;show "-------------------------------------------------"  
+      
       plotxy unemployement_rate vacancy_rate
     ]
   ]
+  display
 end
 
 to setup-simulations [initialU initialV]
@@ -51,6 +68,7 @@ to setup-simulations [initialU initialV]
   setup-persons
   setup-companies
   
+  set stop_comp FALSE
   set number_of_persons initialU
   set number_of_companies initialV
 
