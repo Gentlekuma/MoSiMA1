@@ -1,0 +1,107 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                         MATCHING PROCEDURES                          ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; fonction qui se charge de comparer les exigences d'une PERSON et d'une COMPANY
+; renvoie un bolléen : si les 2 agents se correspondent ou pas
+to-report compare [person company]
+  let similarity-person compute-similarity-person person company
+  let similarity-company compute-similarity-company person company
+  let similarity mean List similarity-person similarity-company
+  report similarity >= minimum_similarity_required
+end
+
+; fonction qui calcule la valeur de la similarité du point de vue de l'employé
+; renvoie un nombre entre 0 et 1
+;actuellement les deux fonctions sont semblables, comme le veut l'article, mais il sera possible de les différencier pour améliorer le modèle par la suite
+; on considère que la motivation execptionnelle intervient à ce niveau pour faire augmenter les chances que la personne accepte ce travail
+; elle a une probabilité d'arriver de exceptional_event_proba
+to-report compute-similarity-person [person company]
+  let similarity_skills compute-similarity_skills [skills] of person [skills] of company
+  let similarity_location compute-similarity_location [location] of person [location] of company
+  let similarity_salary compute-similarity_salary [salary] of person [salary] of company
+  let similarity_field compute-similarity_field [field] of company [specialization] of person
+  
+  let similarity (similarity_skills + similarity_location + similarity_salary + similarity_field) / 3
+  if (random-float 1 < exceptional_event_proba) [
+    set similarity similarity + exceptional_worker_motivation
+  ]
+  report min List 1 similarity
+end
+
+; fonction qui calcule la valeur de la similarité du point de vue de l'entreprise
+; renvoie un nombre entre 0 et 1
+;actuellement les deux fonctions sont semblables, comme le veut l'article, mais il sera possible de les différencier pour améliorer le modèle par la suite
+; on considère que la motivation execptionnelle intervient à ce niveau pour faire augmenter les chances que l'entreprise accepte cet employé
+; elle a une probabilité d'arriver de exceptional_event_proba
+to-report compute-similarity-company [person company]
+  let similarity_skills compute-similarity_skills [skills] of company [skills] of person
+  let similarity_location compute-similarity_location [location] of company [location] of person
+  let similarity_salary compute-similarity_salary [salary] of company [salary] of person
+  let similarity_field compute-similarity_field [field] of company [specialization] of person
+  let similarity_experience compute-similarity_expérience [experience] of person [experience_required] of company
+  
+  let similarity (similarity_skills + similarity_location + similarity_salary + similarity_field + similarity_experience) / 5
+  if (random-float 1 < exceptional_event_proba) [
+    set similarity similarity + exceptional_company_motivation
+  ]
+  report min List 1 similarity
+end
+
+; fonction qui calcule la similarité entre les compétences attendus par l'entreprise et celles possédées par le candidat
+; renvoie un nombre entre 0 et 1
+; elle renvoie le même résultat pour les agents PERSON et les agents COMPANY
+to-report compute-similarity_skills [skills1 skills2]
+  let counting 0
+  (foreach skills1 skills2 [
+    if ?1 = ?2 [
+       set counting counting + 1
+    ]
+  ])
+  report counting / length skills1
+
+end
+
+; fonction qui calcule la similarité entre les lieux de l'entreprise et du candidat
+; renvoie un nombre entre 0 et 1
+; elle renvoie le même résultat pour les agents PERSON et les agents COMPANY
+to-report compute-similarity_location [location1 location2]
+  ifelse location1 = location2
+  [report 1]
+  [report 0]
+end
+
+; fonction qui retourne la similarité entre les salaires
+; renvoie un nombre entre 0 et 1
+; elle renvoie le même résultat pour les agents PERSON et les agents COMPANY
+; on veut que les salaires soient le plus proche possible : si le salaire proposé est trop élevé par rapport aux attentes de l'employé, c'est mauvais pour la similarité de celui-ci
+to-report compute-similarity_salary [salary1 salary2]
+  let max_value max List salary1 salary2
+  let min_value min List salary1 salary2
+  report 1 - (max_value - min_value) / max_value
+end
+
+; fonction qui retourne la similarité entre l'expérience du candidat et l'expérience exigée par l'entreprise
+; renvoie un nombre entre 0 et 1
+; elle n'est utilisée que par les agents COMPANY, car c'est l'entreprise qui veut que l'employé ait le niveau d'expérience requis et non l'inverse
+; si l'employé a plus d'expérience que le niveau requis, la similarité est de 1, sinon, elle est en proportion à ce qu'il a
+to-report compute-similarity_expérience [experience_of_person experience_required_by_company]
+  ifelse experience_of_person >= experience_required_by_company or experience_required_by_company = 0 [
+    report 1
+  ] [
+    report experience_of_person / experience_required_by_company
+  ]
+end
+
+; fonction qui retourne le domaine d'activité de l'entreprise et la spécialisation de l'employé
+; renvoie un nombre entre 0 et 1
+; elle renvoie le même résultat pour les agents PERSON et les agents COMPANY
+; si l'employé n'a aucune spécialisation, la valeur retourné est 1. sinon, la valeur retournée est le pourcentage de toutes ses spécialization
+to-report compute-similarity_field [field_of_company specialization_of_person]
+  ifelse sum specialization_of_person = 0 [    
+    report 1
+  ] [
+    let specialization-value item field_of_company specialization_of_person
+    report  specialization-value / sum specialization_of_person
+  ]
+end
