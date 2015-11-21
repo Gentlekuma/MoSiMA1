@@ -1,4 +1,4 @@
-__includes[ "setup.nls" "display.nls" "matching_procedures.nls" "job_procedures.nls" "beveridge.nls"]
+__includes[ "setup.nls" "display.nls" "matching_procedures.nls" "job_procedures.nls" "computing.nls" "beveridge.nls"]
 
 globals [
   timeout
@@ -117,54 +117,6 @@ to update-jobs
       if productivity < minimum_productivity_required [
         firing_procedure [employee] of employer employer
       ]
-    ]
-  ]
-end
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;                         COMPUTING PROCEDURES                         ;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-to compute-values
-  set unemployement_level count persons with [not employed]
-  set vacancy_level count companies with [not job_filled]
-  set unemployement_rate unemployement_level / labor_force
-  set vacancy_rate vacancy_level / labor_force
-  updates-last-values
-end
-
-; procédure qui met à jour les lists last-values-unemployement et last-values-vacancy qui gardent en mémoire les 10 dernières valeurs de unemployement_rate et vacancy_rate respectivement
-to updates-last-values
-  ifelse ticks < nb-of-step-remembered [
-    set last-values-unemployement lput unemployement_rate last-values-unemployement
-    set last-values-vacancy lput vacancy_rate last-values-vacancy
-  ]
-  [
-    set last-values-unemployement but-first last-values-unemployement
-    set last-values-unemployement lput unemployement_rate last-values-unemployement
-    set last-values-vacancy but-first last-values-vacancy
-    set last-values-vacancy lput vacancy_rate last-values-vacancy
-  ]
-end
-
-; procédure que surveille la convergence d'un système et met à jour la valeur du bolléen CONVERGENCE le cas échéant
-; on surveille l'évolution des valeurs unemployement_rate et vacancy_rate : si elle n'ont pas variée de plus de 5% sur les 10 derniers steps, on considère que le système a convergé
-; évolutions futures : améliorer ce point et rendre cela plus souple
-to compute-convergence
-  if ticks > nb-of-step-remembered [ ; on laisse un certain temps pour que la convergence se fasse
-    let variation-unemployement 0
-    let variation-vacancy 0
-    if not (mean last-values-unemployement = 0) [
-      set variation-unemployement (max last-values-unemployement - min last-values-unemployement) / mean last-values-unemployement
-    ]
-    if not (mean last-values-vacancy = 0) [
-      set variation-vacancy (max last-values-vacancy - min last-values-vacancy) / mean last-values-vacancy
-    ]
-    if variation-unemployement < convergence-margin and variation-vacancy < convergence-margin [
-      set convergence True;
-      show "le système a convergé au tick :"
-      show ticks
     ]
   ]
 end
