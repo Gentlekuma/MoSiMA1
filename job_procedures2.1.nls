@@ -1,0 +1,66 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                             PRODUCTIVITY                             ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; fonction qui calcule la productivité d'une PERSON à chaque tour, en se basant sur la valeur de référence, propre à chaque agent
+; renvoie un nombre entre 0 et 1
+; il s'agit d'une valeur comprise entre + ou - max_productivity_fluctuation de la valeur de référence de productivité de l'agent
+to-report compute-productivity
+  let productivity reference_productivity - max_productivity_fluctuation + random-float ( 2 * max_productivity_fluctuation * reference_productivity)
+  if productivity < 0 [
+    set productivity 0
+  ]
+  if productivity > 1 [
+    set productivity 1
+  ]
+  report productivity
+end
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                     HIRING AND FIRING PROCEDURES                     ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; procédure d'embauche
+; on met à jour les attributs des agents
+to hiring_procedure [person company]
+  ask person [
+    set color color-person-employed
+    set employed True
+    set employer company
+    update-specialization
+    create-link-with company
+  ]
+  ask company [
+    set color color-company-filled-job
+    set job_filled True
+    set employee person
+  ]
+end
+
+; procédure de licenciement
+; on met à jour les attributs des agents
+to firing_procedure [person company]
+  ask person [
+    set color color-person-unemployed
+    set employed False
+    set employer nobody
+    ask my-links [die]
+  ]
+  ask company [
+    set experience_required [experience] of employee
+    set color color-company-vacant-job
+    set job_filled False
+    set employee nobody
+  ]
+end
+
+; procedure qui met à jour l'attirbut specilization d'un employé lorsque celui-ci trouve un travail dans un certain domaine
+to update-specialization
+  let field_of_company [field] of employer 
+  let old_specilization_value item field_of_company specialization 
+  let new_specialization_value old_specilization_value + 1
+  let new_specialization replace-item field_of_company specialization new_specialization_value
+  set specialization new_specialization
+end
