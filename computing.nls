@@ -12,7 +12,6 @@ to compute-values
   update-average-job-duration
   update-average-unemployement-duration
   update-average-vacant-duration
-  update-market-friction
 end
 
 to update-average-job-duration
@@ -20,7 +19,11 @@ to update-average-job-duration
     set job-time ( job-time + 1 )
   ]
   let job-sum sum [job-time] of persons
-  set average-job-duration ( job-sum / (nb_of_persons - unemployement_level) )
+  ifelse (nb_of_persons - unemployement_level) = 0 [
+    set average-job-duration 0
+  ] [   
+    set average-job-duration ( job-sum / (nb_of_persons - unemployement_level) )
+  ]
 end
 
 to update-average-unemployement-duration
@@ -28,20 +31,23 @@ to update-average-unemployement-duration
     set unemployement-time ( unemployement-time + 1 )
   ]
   let unemployement-sum sum [unemployement-time] of persons
-  set average-unemployement-duration ( unemployement-sum / unemployement_level)
+  ifelse (unemployement-sum / unemployement_level) = 0 [
+    set average-unemployement-duration 0
+  ] [  
+    set average-unemployement-duration (unemployement-sum / unemployement_level)
+  ]
 end
 
 to update-average-vacant-duration
   ask companies with [not job_filled] [
     set vacant-time ( vacant-time + 1 )
   ]
-  let vacant-sum sum [vacant-time] of companies
-  set average-vacant-duration ( vacant-sum / vacancy_level)
-end
-
-to update-market-friction
-  set friction nb-failed-matching / nb_of_pairs_considered
-  set nb-failed-matching 0
+  let vacant-sum sum [vacant-time] of companies  
+  ifelse (vacant-sum / vacancy_level) = 0 [
+    set average-vacant-duration 0
+  ] [  
+    set average-vacant-duration (vacant-sum / vacancy_level)
+  ]
 end
 
 ;procédure qui met en mémoire les min(nb-of-step-remembered, ticks) derniers éléments en mémoire dans last-values-unemployement
