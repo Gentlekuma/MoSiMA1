@@ -18,6 +18,7 @@ to setup-globals
   set exceptional_worker_motivation unexpected_worker_motivation
   set nb_of_field_possibles number_of_field_possibles
   set maximum_productivity_fluctuation max_productivity_fluctuation
+  set maximum_statisfaction_fluctuation max_satisfaction_fluctuation
   set exceptional_motivation_event exceptional_motivation_chances
   set strong_matching_threshold exceptional_matching
   set random_resigning_threshold random_resigning_chances
@@ -68,6 +69,7 @@ to setup-persons
     set size 2
     set-random-skills-location-salary
     set-productivity
+    set-satisfaction-required
     set-initial-specialization
     set experience 0
     set employed False
@@ -85,6 +87,7 @@ to setup-companies
     set size 2
     set-random-skills-location-salary
     set-random-field
+    set-satisfaction
     set experience_required 0
     set job_filled False
     set employee nobody
@@ -113,6 +116,24 @@ to set-productivity
   ;set reference_productivity random-float 1
 end
 
+; procédure qui fixe la valeur de satisfaction au travail exigée par une personne
+to set-satisfaction-required
+  set minimum_satisfaction_required random-normal 0.5 0.3
+end
+
+; procédure qui fixe la valeur de référence de la productivité de l'employé au hasard selon une loi normale (pour ne pas avoir de valeurs trop extrèmes)
+to set-satisfaction
+  set reference_satisfaction random-normal 0.7 0.3
+  
+  if reference_satisfaction < 0 [
+    set reference_satisfaction 0
+  ]
+  if reference_satisfaction > 1 [
+    set reference_satisfaction 1
+  ]
+  ;set reference_productivity random-float 1
+end
+
 ; procédure qui fixe le domaine de l'entreprise
 to set-random-field
   set field random nb_of_field_possibles
@@ -137,6 +158,7 @@ to reset-globals
   set unexpected_company_motivation 0.1
   set unexpected_worker_motivation 0.1
   set max_productivity_fluctuation 0.3
+  set max_satisfaction_fluctuation 0.3
   set number_of_field_possibles 5
   set random_resigning_chances 0.2
   set display_bc false
