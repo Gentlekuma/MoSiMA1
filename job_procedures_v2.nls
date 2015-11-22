@@ -4,11 +4,13 @@
 
 ; procédure d'embauche
 ; on met à jour les attributs des agents
-to hiring_procedure_v2 [person company]
+to hiring_procedure_v2 [person company similarity]
   ask person [
     set color color-person-employed
     set employed True
     set employer company
+    set strong-matching ( similarity > strong_matching_threshold )
+    set unemployement-time 0
     update-specialization_v2
     create-link-with company
   ]
@@ -16,25 +18,11 @@ to hiring_procedure_v2 [person company]
     set color color-company-filled-job
     set job_filled True
     set employee person
+    set strong-matching ( similarity > strong_matching_threshold )
+    set vacant-time 0
   ]
 end
 
-; procédure de licenciement
-; on met à jour les attributs des agents
-to firing_procedure_v2 [person company]
-  ask person [
-    set color color-person-unemployed
-    set employed False
-    set employer nobody
-    ask my-links [die]
-  ]
-  ask company [
-    set experience_required [experience] of employee
-    set color color-company-vacant-job
-    set job_filled False
-    set employee nobody
-  ]
-end
 
 ; procedure qui met à jour l'attirbut specilization d'un employé lorsque celui-ci trouve un travail dans un certain domaine
 to update-specialization_v2

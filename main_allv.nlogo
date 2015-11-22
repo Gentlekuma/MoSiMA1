@@ -23,6 +23,7 @@ globals [
   max_salary
   nb_of_locations_possibles
   maximum_productivity_fluctuation
+  maximum_statisfaction_fluctuation
   minimum_similarity_required
   minimum_productivity_required
   exceptional_firing
@@ -30,7 +31,8 @@ globals [
   exceptional_worker_motivation
   nb_of_field_possibles
   exceptional_motivation_event
-  strong-matching-treshold
+  strong_matching_threshold
+  random_resigning_threshold
 
   ; mesures
   unemployement_level
@@ -63,8 +65,8 @@ breed [persons person]
 breed [companies company]
 breed [matching matching-agent]
 
-persons-own [skills location salary reference_productivity employed employer experience specialization strong-matching job-time unemployement-time]
-companies-own [skills location salary job_filled employee experience_required field strong-matching vacant-time]
+persons-own [skills location salary reference_productivity minimum_satisfaction_required employed employer experience specialization strong-matching job-time unemployement-time]
+companies-own [skills location salary reference_satisfaction job_filled employee experience_required field strong-matching vacant-time]
 
 
 
@@ -173,10 +175,10 @@ NIL
 0
 
 TEXTBOX
-11
-368
-162
-386
+10
+408
+161
+426
 Matching settings :
 11
 0.0
@@ -191,7 +193,7 @@ number_of_persons
 number_of_persons
 10
 500
-401
+400
 10
 1
 NIL
@@ -206,17 +208,17 @@ number_of_companies
 number_of_companies
 10
 500
-401
+400
 10
 1
 NIL
 HORIZONTAL
 
 SLIDER
-7
-520
-189
-553
+6
+560
+188
+593
 number_of_pairs_considered
 number_of_pairs_considered
 0
@@ -258,10 +260,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-9
-609
-191
-642
+6
+368
+188
+401
 number_of_locations_possibles
 number_of_locations_possibles
 1
@@ -283,10 +285,10 @@ Agents' personal preferences settings :\n
 1
 
 SLIDER
-7
-419
-189
-452
+6
+459
+188
+492
 matching_quality_threshold
 matching_quality_threshold
 0
@@ -436,10 +438,10 @@ PENS
 "pen-0" 1.0 0 -2674135 true "" ""
 
 SLIDER
-8
-571
-191
-604
+243
+498
+426
+531
 number_of_field_possibles
 number_of_field_possibles
 1
@@ -497,7 +499,7 @@ nb_of_U_points
 nb_of_U_points
 2
 100
-8
+4
 1
 1
 NIL
@@ -512,7 +514,7 @@ nb_of_V_points
 nb_of_V_points
 2
 100
-8
+4
 1
 1
 NIL
@@ -600,10 +602,10 @@ stop_comp
 -1000
 
 SLIDER
-7
-384
-189
-417
+6
+424
+188
+457
 exceptional_matching
 exceptional_matching
 0
@@ -624,23 +626,13 @@ version
 1 2
 0
 
-TEXTBOX
-19
-552
-169
-586
-Additional parameters :
-14
-0.0
-1
-
 SLIDER
-7
-454
-189
-487
-except_motivation_chance
-except_motivation_chance
+6
+494
+188
+527
+exceptional_motivation_chances
+exceptional_motivation_chances
 0
 1
 0.1
@@ -701,10 +693,10 @@ percents
 HORIZONTAL
 
 TEXTBOX
-8
-491
-185
-518
+7
+531
+184
+558
 Percentage of U+V of pairs for the matching procedure at each tick :
 11
 0.0
@@ -843,6 +835,57 @@ TEXTBOX
 48
 Indicators' moving averages over the last 100 steps :
 11
+0.0
+1
+
+SLIDER
+243
+566
+426
+599
+max_satisfaction_fluctuation
+max_satisfaction_fluctuation
+0
+1
+0.3
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+243
+532
+426
+565
+random_resigning_chances
+random_resigning_chances
+0
+1
+0.2
+0.1
+1
+NIL
+HORIZONTAL
+
+SWITCH
+243
+600
+392
+633
+random_resignation
+random_resignation
+1
+1
+-1000
+
+TEXTBOX
+245
+481
+395
+499
+Version 2 parameters :\n
+12
 0.0
 1
 

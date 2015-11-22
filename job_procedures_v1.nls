@@ -9,7 +9,7 @@ to hiring_procedure_v1 [person company similarity]
     set color color-person-employed
     set employed True
     set employer company
-    set strong-matching similarity > strong-matching-treshold
+    set strong-matching ( similarity > strong_matching_threshold )
     set unemployement-time 0
     create-link-with company
   ]
@@ -17,7 +17,7 @@ to hiring_procedure_v1 [person company similarity]
     set color color-company-filled-job
     set job_filled True
     set employee person
-    set strong-matching similarity > strong-matching-treshold
+    set strong-matching ( similarity > strong_matching_threshold )
     set vacant-time 0
   ]
 end
@@ -40,4 +40,3 @@ to firing_procedure_v1 [person company]
     ]
   ]
 end
-
