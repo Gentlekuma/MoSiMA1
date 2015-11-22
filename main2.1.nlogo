@@ -36,7 +36,14 @@ globals [
   average-vacant-duration
   nb-failed-matching
   friction
-
+  last-values-indic2
+  last-values-indic3
+  last-values-indic4
+  last-values-indic5
+  indic-2
+  indic-3
+  indic-4
+  indic-5
   ; variables pour la convergence
   convergence
   last-values-unemployement
@@ -109,13 +116,13 @@ to go
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-192
-83
-661
-573
+191
+212
+487
+517
 25
-25
-9.0
+24
+5.61
 1
 14
 1
@@ -127,8 +134,8 @@ GRAPHICS-WINDOW
 1
 -25
 25
--25
-25
+-24
+24
 1
 1
 1
@@ -298,7 +305,7 @@ TEXTBOX
 14
 10
 187
-44
+28
 Original System settings :
 14
 0.0
@@ -313,7 +320,7 @@ firing_quality_threshold
 firing_quality_threshold
 0
 1
-0.5
+0
 0.1
 1
 NIL
@@ -365,11 +372,11 @@ NIL
 HORIZONTAL
 
 PLOT
-663
-136
-865
-262
-vacancy rate
+490
+129
+692
+255
+unemployement rate
 time
 NIL
 0.0
@@ -380,7 +387,7 @@ true
 false
 "" ""
 PENS
-"vacancy_rate" 1.0 0 -955883 true "" "plot vacancy_rate"
+"vacancy_rate" 1.0 0 -955883 true "" "plot unemployement_rate"
 
 SLIDER
 5
@@ -398,10 +405,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-669
-10
-877
-43
+491
+271
+699
+304
 generate simulations for Beveridge curve
 generate-simulations-BC
 NIL
@@ -415,10 +422,10 @@ NIL
 1
 
 PLOT
-664
-392
-1271
-637
+490
+418
+1097
+663
 beveridge_curve
 unemployment_rate
 vacancy_rate
@@ -465,10 +472,10 @@ NIL
 1
 
 SWITCH
-1261
-11
-1361
-44
+1083
+272
+1183
+305
 display_bc
 display_bc
 1
@@ -476,20 +483,20 @@ display_bc
 -1000
 
 TEXTBOX
-1103
-10
-1253
-52
+925
+271
+1075
+313
 Turns on or off display while computing the Beveridge curve to speed up the process :
 11
 0.0
 1
 
 SLIDER
-670
-67
-842
-100
+492
+328
+664
+361
 nb_of_U_points
 nb_of_U_points
 2
@@ -501,10 +508,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-670
-101
-842
-134
+492
+362
+664
+395
 nb_of_V_points
 nb_of_V_points
 2
@@ -516,10 +523,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-843
-67
-1015
-100
+665
+328
+837
+361
 U_min
 U_min
 10
@@ -531,10 +538,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1016
-67
-1188
-100
+838
+328
+1010
+361
 U_max
 U_max
 U_min
@@ -546,10 +553,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-843
-101
-1015
-134
+665
+362
+837
+395
 V_min
 V_min
 10
@@ -561,10 +568,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-1016
-101
-1188
-134
+838
+362
+1010
+395
 V_max
 V_max
 V_min
@@ -576,20 +583,20 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-675
-46
-968
-64
+497
+307
+790
+325
 Parameters for the Beveridge curve :
 11
 0.0
 1
 
 SWITCH
-991
-11
-1090
-44
+813
+272
+912
+305
 stop_comp
 stop_comp
 1
@@ -647,20 +654,20 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-897
-12
-996
-40
+719
+273
+818
+301
 Click to cancel the BC computation :
 11
 0.0
 1
 
 SLIDER
-495
-10
-668
-43
+255
+92
+428
+125
 timeout
 timeout
 500
@@ -672,26 +679,26 @@ NIL
 HORIZONTAL
 
 MONITOR
-663
-264
-865
-309
-average u from the last 100 steps
+642
+46
+773
+91
+unemployement level
 moving-average
 5
 1
 11
 
 SLIDER
-495
-44
-668
-77
+255
+126
+428
+159
 converge-criteria
 converge-criteria
 0
 1
-0.1
+0.05
 0.05
 1
 percents
@@ -708,10 +715,10 @@ Percentage of U+V of pairs for the matching procedure at each tick :
 1
 
 PLOT
-866
-135
-1068
-262
+693
+128
+895
+255
 average unemployement time
 ticks
 time (ticks)
@@ -726,10 +733,10 @@ PENS
 "default" 1.0 0 -8431303 true "" "plot average-unemployement-duration"
 
 PLOT
-1069
-135
-1271
-262
+895
+128
+1097
+255
 average job time
 ticks
 time (ticks)
@@ -744,10 +751,10 @@ PENS
 "default" 1.0 0 -13791810 true "" "plot average-job-duration"
 
 PLOT
-866
-264
-1067
-390
+1097
+129
+1298
+255
 average vacancy time
 ticks
 time (ticks)
@@ -762,10 +769,10 @@ PENS
 "default" 1.0 0 -13840069 true "" "plot average-vacant-duration"
 
 PLOT
-1069
-264
-1271
-390
+1300
+129
+1502
+255
 Market friction rate
 time
 NIL
@@ -778,6 +785,70 @@ false
 "" ""
 PENS
 "default" 1.0 0 -5825686 true "" "plot friction"
+
+MONITOR
+775
+46
+906
+91
+unemployement duration
+indic-2
+0
+1
+11
+
+MONITOR
+908
+46
+1039
+91
+job duration
+indic-3
+0
+1
+11
+
+MONITOR
+1041
+46
+1172
+91
+vacant duration
+indic-4
+0
+1
+11
+
+MONITOR
+1174
+46
+1305
+91
+friction
+indic-5
+2
+1
+11
+
+TEXTBOX
+503
+10
+612
+28
+Indicators plots :
+14
+0.0
+1
+
+TEXTBOX
+502
+56
+638
+84
+Indicators' moving averages over the last 100 steps :
+11
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

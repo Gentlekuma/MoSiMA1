@@ -13,6 +13,7 @@ to compute-values
   update-average-unemployement-duration
   update-average-vacant-duration
   update-market-friction
+  update-indicators
 end
 
 to update-average-job-duration
@@ -20,7 +21,9 @@ to update-average-job-duration
     set job-time ( job-time + 1 )
   ]
   let job-sum sum [job-time] of persons
-  set average-job-duration ( job-sum / (nb_of_persons - unemployement_level) )
+  if nb_of_persons != unemployement_level [
+    set average-job-duration ( job-sum / (nb_of_persons - unemployement_level) )
+  ]
 end
 
 to update-average-unemployement-duration
@@ -28,7 +31,9 @@ to update-average-unemployement-duration
     set unemployement-time ( unemployement-time + 1 )
   ]
   let unemployement-sum sum [unemployement-time] of persons
-  set average-unemployement-duration ( unemployement-sum / unemployement_level)
+  if unemployement_level != 0 [
+    set average-unemployement-duration ( unemployement-sum / unemployement_level)
+  ]
 end
 
 to update-average-vacant-duration
@@ -36,7 +41,9 @@ to update-average-vacant-duration
     set vacant-time ( vacant-time + 1 )
   ]
   let vacant-sum sum [vacant-time] of companies
-  set average-vacant-duration ( vacant-sum / vacancy_level)
+  if vacancy_level != 0 [
+    set average-vacant-duration ( vacant-sum / vacancy_level)
+  ]
 end
 
 to update-market-friction
@@ -51,6 +58,30 @@ to stock-last-values
     set temp but-last temp ;pop last element if list is of size nb-of-step-remembered
   ]
   set last-values-unemployement temp
+  
+  let temp2 fput average-unemployement-duration last-values-indic2 ;push to the beginning of the list
+  if ticks >= nb-of-step-remembered [
+    set temp2 but-last temp2 ;pop last element if list is of size nb-of-step-remembered
+  ]
+  set last-values-indic2 temp2
+  
+  let temp3 fput average-job-duration last-values-indic3 ;push to the beginning of the list
+  if ticks >= nb-of-step-remembered [
+    set temp3 but-last temp3 ;pop last element if list is of size nb-of-step-remembered
+  ]
+  set last-values-indic3 temp3
+  
+  let temp4 fput average-vacant-duration last-values-indic4 ;push to the beginning of the list
+  if ticks >= nb-of-step-remembered [
+    set temp4 but-last temp4 ;pop last element if list is of size nb-of-step-remembered
+  ]
+  set last-values-indic4 temp4
+  
+    let temp5 fput friction last-values-indic5 ;push to the beginning of the list
+  if ticks >= nb-of-step-remembered [
+    set temp5 but-last temp5 ;pop last element if list is of size nb-of-step-remembered
+  ]
+  set last-values-indic5 temp5
 end
 
 ; procédure qui surveille la convergence du système et met à jour la valeur du bolléen CONVERGENCE si il y a convergence
@@ -65,4 +96,13 @@ to update-convergence
       type "The market has converged at tick n° :" type ticks type "\n"
     ]
   ] 
+end
+
+to update-indicators
+  if ticks > nb-of-step-remembered [
+    set indic-2 round mean last-values-indic2
+    set indic-3 round mean last-values-indic3
+    set indic-4 round mean last-values-indic4
+    set indic-5 mean last-values-indic5
+  ]
 end

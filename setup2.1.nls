@@ -34,6 +34,14 @@ to setup-globals
   set nb-of-step-remembered 100 ; nombres de resultats stockés pour le calcul de la convergence
   set convergence-margin 0.05 ; on fixe la marge à 5% quand les valeurs considérées varient de moins de 5 % sur les 10 derniers pas de temps, on considère que le système a convergé
   set nb-failed-matching 0
+  set last-values-indic2 []
+  set last-values-indic3 []
+  set last-values-indic4 []
+  set last-values-indic5 []
+  set indic-2 0
+  set indic-3 0
+  set indic-4 0
+  set indic-5 0
 end
 
 
