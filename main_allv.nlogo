@@ -5,6 +5,7 @@ __includes[
   "beveridge.nls"
   "matching_procedures_allv.nls" "matching_procedures_v1.nls" "matching_procedures_v2.nls"
   "job_procedures_allv.nls" "job_procedures_v1.nls" "job_procedures_v2.nls"
+  "resigning_procedures_v2.nls"
   ]
 
 globals [
@@ -29,8 +30,9 @@ globals [
   exceptional_company_motivation
   exceptional_worker_motivation
   nb_of_field_possibles
-  exceptional_motivation_event ; to reste
-  strong-matching-treshold ; to reset
+  exceptional_motivation_event ; to reset
+  strong_matching_threshold ; to reset
+  random_resigning_threshold
 
   ; mesures
   unemployement_level
@@ -845,6 +847,21 @@ Indicators' moving averages over the last 100 steps :
 11
 0.0
 1
+
+SLIDER
+220
+489
+426
+522
+random_resigning_chances
+random_resigning_chances
+0
+1
+0.2
+0.05
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
