@@ -26,12 +26,16 @@ globals [
   strong-matching-treshold ; to reset
 
   ; mesures
-  labor_force
   unemployement_level
   unemployement_rate
   vacancy_level
   vacancy_rate
   moving-average
+  average-job-duration
+  average-unemployement-duration
+  average-vacant-duration
+  nb-failed-matching
+  friction
 
   ; variables pour la convergence
   convergence
@@ -45,8 +49,8 @@ breed [persons person]
 breed [companies company]
 breed [matching matching-agent]
 
-persons-own [skills location salary productivity employed employer experience specialization strong-matching]
-companies-own [skills location salary job_filled employee experience_required field strong-matching]
+persons-own [skills location salary productivity employed employer experience specialization strong-matching job-time unemployement-time]
+companies-own [skills location salary job_filled employee experience_required field strong-matching vacant-time]
 
 
 
@@ -99,16 +103,15 @@ to go
 
   update-jobs
   compute-values
-  compute-convergence
   stock-last-values
 
   tick
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-241
+192
 83
-710
+661
 573
 25
 25
@@ -133,9 +136,9 @@ ticks
 30.0
 
 BUTTON
-242
+193
 10
-311
+262
 43
 setup
 setup
@@ -150,9 +153,9 @@ NIL
 1
 
 BUTTON
-380
+331
 10
-447
+398
 43
 go
 go
@@ -362,11 +365,11 @@ NIL
 HORIZONTAL
 
 PLOT
-718
-135
-970
-311
-vacancy_rate
+663
+136
+865
+262
+vacancy rate
 time
 NIL
 0.0
@@ -395,9 +398,9 @@ NIL
 HORIZONTAL
 
 BUTTON
-718
+669
 10
-926
+877
 43
 generate simulations for Beveridge curve
 generate-simulations-BC
@@ -412,10 +415,10 @@ NIL
 1
 
 PLOT
-718
-312
-1218
-584
+664
+392
+1271
+637
 beveridge_curve
 unemployment_rate
 vacancy_rate
@@ -445,9 +448,9 @@ NIL
 HORIZONTAL
 
 BUTTON
-314
+265
 10
-377
+328
 43
 reset
 reset
@@ -462,9 +465,9 @@ NIL
 1
 
 SWITCH
-1310
+1261
 11
-1410
+1361
 44
 display_bc
 display_bc
@@ -473,9 +476,9 @@ display_bc
 -1000
 
 TEXTBOX
-1152
+1103
 10
-1302
+1253
 52
 Turns on or off display while computing the Beveridge curve to speed up the process :
 11
@@ -483,9 +486,9 @@ Turns on or off display while computing the Beveridge curve to speed up the proc
 1
 
 SLIDER
-719
+670
 67
-891
+842
 100
 nb_of_U_points
 nb_of_U_points
@@ -498,9 +501,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-719
+670
 101
-891
+842
 134
 nb_of_V_points
 nb_of_V_points
@@ -513,9 +516,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-892
+843
 67
-1064
+1015
 100
 U_min
 U_min
@@ -528,9 +531,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-1065
+1016
 67
-1237
+1188
 100
 U_max
 U_max
@@ -543,9 +546,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-892
+843
 101
-1064
+1015
 134
 V_min
 V_min
@@ -558,9 +561,9 @@ NIL
 HORIZONTAL
 
 SLIDER
-1065
+1016
 101
-1237
+1188
 134
 V_max
 V_max
@@ -573,9 +576,9 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-724
+675
 46
-1017
+968
 64
 Parameters for the Beveridge curve :
 11
@@ -583,35 +586,15 @@ Parameters for the Beveridge curve :
 1
 
 SWITCH
-1040
+991
 11
-1139
+1090
 44
 stop_comp
 stop_comp
 1
 1
 -1000
-
-TEXTBOX
-190
-42
-205
-60
-U
-11
-0.0
-1
-
-TEXTBOX
-190
-80
-205
-98
-V
-11
-0.0
-1
 
 SLIDER
 7
@@ -629,9 +612,9 @@ NIL
 HORIZONTAL
 
 CHOOSER
-450
+401
 10
-542
+493
 55
 version
 version
@@ -664,9 +647,9 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-946
+897
 12
-1045
+996
 40
 Click to cancel the BC computation :
 11
@@ -674,9 +657,9 @@ Click to cancel the BC computation :
 1
 
 SLIDER
-544
+495
 10
-717
+668
 43
 timeout
 timeout
@@ -689,26 +672,26 @@ NIL
 HORIZONTAL
 
 MONITOR
-971
-135
-1130
-180
-average U from last steps
+663
+264
+865
+309
+average u from the last 100 steps
 moving-average
 5
 1
 11
 
 SLIDER
-544
+495
 44
-717
+668
 77
 converge-criteria
 converge-criteria
 0
 1
-0.05
+0.1
 0.05
 1
 percents
@@ -723,6 +706,78 @@ Percentage of U+V of pairs for the matching procedure at each tick :
 11
 0.0
 1
+
+PLOT
+866
+135
+1068
+262
+average unemployement time
+ticks
+time (ticks)
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -8431303 true "" "plot average-unemployement-duration"
+
+PLOT
+1069
+135
+1271
+262
+average job time
+ticks
+time (ticks)
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -13791810 true "" "plot average-job-duration"
+
+PLOT
+866
+264
+1067
+390
+average vacancy time
+ticks
+time (ticks)
+0.0
+1.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -13840069 true "" "plot average-vacant-duration"
+
+PLOT
+1069
+264
+1271
+390
+Market friction rate
+time
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -5825686 true "" "plot friction"
 
 @#$#@#$#@
 ## WHAT IS IT?

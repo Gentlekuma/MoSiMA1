@@ -15,8 +15,11 @@ to agents-matching
       set random-person one-of persons with [not employed]
       set random-company one-of companies with [not job_filled]
       let similarity compute-similarity-value random-person random-company
-      if similarity >= minimum_similarity_required [
+      ifelse similarity >= minimum_similarity_required [
         hiring_procedure random-person random-company similarity
+      ]
+      [
+        set nb-failed-matching ( nb-failed-matching + 1 )
       ]
     ]
   ]

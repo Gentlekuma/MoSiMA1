@@ -5,8 +5,43 @@
 to compute-values
   set unemployement_level count persons with [not employed]
   set vacancy_level count companies with [not job_filled]
-  set unemployement_rate unemployement_level / labor_force
-  set vacancy_rate vacancy_level / labor_force
+  set unemployement_rate unemployement_level / nb_of_persons
+  set vacancy_rate vacancy_level / nb_of_persons
+  
+  update-convergence
+  update-average-job-duration
+  update-average-unemployement-duration
+  update-average-vacant-duration
+  update-market-friction
+end
+
+to update-average-job-duration
+  ask persons with [employed] [
+    set job-time ( job-time + 1 )
+  ]
+  let job-sum sum [job-time] of persons
+  set average-job-duration ( job-sum / (nb_of_persons - unemployement_level) )
+end
+
+to update-average-unemployement-duration
+  ask persons with [not employed] [
+    set unemployement-time ( unemployement-time + 1 )
+  ]
+  let unemployement-sum sum [unemployement-time] of persons
+  set average-unemployement-duration ( unemployement-sum / unemployement_level)
+end
+
+to update-average-vacant-duration
+  ask companies with [not job_filled] [
+    set vacant-time ( vacant-time + 1 )
+  ]
+  let vacant-sum sum [vacant-time] of companies
+  set average-vacant-duration ( vacant-sum / vacancy_level)
+end
+
+to update-market-friction
+  set friction nb-failed-matching / nb_of_pairs_considered
+  set nb-failed-matching 0
 end
 
 ;procédure qui met en mémoire les min(nb-of-step-remembered, ticks) derniers éléments en mémoire dans last-values-unemployement
@@ -21,7 +56,7 @@ end
 ; procédure qui surveille la convergence du système et met à jour la valeur du bolléen CONVERGENCE si il y a convergence
 ; critère : unemployement-level
 ; on calcul une moyenne glissante et on regarde si le nouveau résultat est proche ou non
-to compute-convergence
+to update-convergence
   if ticks > nb-of-step-remembered [
     set moving-average mean last-values-unemployement
     
@@ -30,18 +65,4 @@ to compute-convergence
       type "The market has converged at tick n° :" type ticks type "\n"
     ]
   ] 
-    
-  ; let variation-unemployement 0
-  ;  let variation-vacancy 0
-  ;  if not (mean last-values-unemployement = 0) [
-  ;    set variation-unemployement (max last-values-unemployement - min last-values-unemployement) / mean last-values-unemployement
-  ;  ]
-  ;  if not (mean last-values-vacancy = 0) [
-  ;    set variation-vacancy (max last-values-vacancy - min last-values-vacancy) / mean last-values-vacancy
-  ;  ]
-  ;  if variation-unemployement < convergence-margin and variation-vacancy < convergence-margin [
-  ;    set convergence True;
-  ;    type "le système a convergé au tick :" type ticks
-  ;  ]
-  ;]
 end

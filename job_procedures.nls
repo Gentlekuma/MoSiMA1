@@ -66,6 +66,7 @@ to hiring_procedure [person company similarity]
     set employer company
     set productivity 1
     set strong-matching similarity > strong-matching-treshold
+    set unemployement-time 0
     create-link-with company
   ]
   ask company [
@@ -73,6 +74,7 @@ to hiring_procedure [person company similarity]
     set job_filled True
     set employee person
     set strong-matching similarity > strong-matching-treshold
+    set vacant-time 0
   ]
 end
 
@@ -83,6 +85,7 @@ to firing_procedure [person company]
     set color color-person-unemployed
     set employed False
     set employer nobody
+    set job-time 0
     ask my-links [die]
   ]
   ask company [
