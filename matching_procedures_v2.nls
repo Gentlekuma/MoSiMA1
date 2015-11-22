@@ -14,8 +14,9 @@ to agents-matching_v2 ;;TODO : rajout des fonctions supplémentaires
     repeat nb_of_matches [
       set random-person one-of persons with [not employed]
       set random-company one-of companies with [not job_filled]
-      ifelse compare-2 random-person random-company [
-        hiring_procedure_v2 random-person random-company
+      let similarity compute-similarity-value_v1 random-person random-company
+      ifelse similarity >= minimum_similarity_required [
+        hiring_procedure_v2 random-person random-company similarity
       ]
       [
         set nb-failed-matching ( nb-failed-matching + 1 )
