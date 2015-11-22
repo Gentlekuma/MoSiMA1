@@ -5,14 +5,14 @@
 ; fonction qui calcule la productivité d'une PERSON à chaque tour
 to-report compute-productivity   
 
-  let temp reference_productivity + (random-float (2) - 1) * maximum_productivity_fluctuation
-  
-  ifelse temp > 1[
-    report 1
+  let temp reference_productivity + (random-float (2) - 1) * maximum_productivity_fluctuation * reference_productivity
+  if temp > 1 [
+    set temp 1
   ]
-  [
-    report temp
+  if temp < 0 [
+    set temp 0
   ]
+  report temp
 end
 
 
