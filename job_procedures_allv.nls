@@ -19,28 +19,45 @@ end
 ; procédure qui a chaque tour, décide des productivités des employés et de si ils se font licencier ou non
 ; on considère le paramètre exceptional_firing comme une augmentation des attentes de l'employeur qui a une probabilité d'arriver de exceptional_event_probability
 to update-jobs
+  set-current-plot "plot1"
+  let x 0
+  let z 0
+  let y 0
+  type " " type count persons with [employed] type "persons have a job\n"
   ask persons [
     if employed [
       set experience experience + 1
       let productivity compute-productivity
-
-      if ( (random-float 1 <= exceptional_firing) or (productivity < minimum_productivity_required) ) 
+      ifelse ( (random-float 1 <= exceptional_firing) or (productivity < minimum_productivity_required) ) 
       [
+        set z z + 1
         ifelse version = 1
+        [
+          firing_procedure_v1 [employee] of employer employer
+        ]
+        [
+          ifelse version = 2 
           [
-            firing_procedure_v1 [employee] of employer employer
+            firing_procedure_v2 [employee] of employer employer
           ]
           [
-            ifelse version = 2 
-            [
-              firing_procedure_v2 [employee] of employer employer
-            ]
-            [
-              ;firing_procedure_v3 [employee] of employer employer
-            ]
+            ;firing_procedure_v3 [employee] of employer employer
           ]
+        ]
+      ]
+      [
+        set x x + resigning_random_v2 self
+        set y y + 1
       ]
     ]
   ]
+  
+  set-current-plot-pen "fired"
+  plot z
+  set-current-plot-pen "resigned"
+  plot x
+  type "      " type z type " persons have been fired\n" 
+  type "      " type x type " persons have resigned\n"
+  type "      " type y type " persons considered resigning\n"
 end
 
