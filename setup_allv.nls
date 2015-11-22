@@ -144,7 +144,7 @@ to reset-globals
   set U_max 400
   set V_max 400
   set except_motivation_chance 0.1
-  set exceptional_matching 0.7
+  set exceptional_matching 1
   set timeout 1000
   set converge-criteria 0.05
   set unexpected_firing 0.1

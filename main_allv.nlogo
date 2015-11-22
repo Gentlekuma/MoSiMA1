@@ -29,8 +29,8 @@ globals [
   exceptional_company_motivation
   exceptional_worker_motivation
   nb_of_field_possibles
-  exceptional_motivation_event ; to reste
-  strong-matching-treshold ; to reset
+  exceptional_motivation_event
+  strong-matching-treshold
 
   ; mesures
   unemployement_level
@@ -191,7 +191,7 @@ number_of_persons
 number_of_persons
 10
 500
-400
+401
 10
 1
 NIL
@@ -206,7 +206,7 @@ number_of_companies
 number_of_companies
 10
 500
-400
+401
 10
 1
 NIL
@@ -497,7 +497,7 @@ nb_of_U_points
 nb_of_U_points
 2
 100
-4
+8
 1
 1
 NIL
@@ -512,7 +512,7 @@ nb_of_V_points
 nb_of_V_points
 2
 100
-4
+8
 1
 1
 NIL
@@ -608,7 +608,7 @@ exceptional_matching
 exceptional_matching
 0
 1
-0.7
+1
 0.05
 1
 NIL
