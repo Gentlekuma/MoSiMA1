@@ -113,9 +113,9 @@ end
 @#$#@#$#@
 GRAPHICS-WINDOW
 191
-212
+164
 487
-517
+469
 25
 24
 5.61
@@ -221,7 +221,7 @@ number_of_pairs_considered
 number_of_pairs_considered
 0
 100
-30
+50
 1
 1
 (percentage of U+V)
@@ -236,7 +236,7 @@ minimum_salary
 minimum_salary
 500
 1500
-1500
+500
 100
 1
 NIL
@@ -251,7 +251,7 @@ maximum_salary
 maximum_salary
 1500
 10000
-1500
+3000
 100
 1
 NIL
@@ -273,9 +273,9 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-8
+2
 283
-200
+194
 301
 Agents' personal preferences settings :\n
 11
@@ -368,10 +368,10 @@ NIL
 HORIZONTAL
 
 PLOT
-490
-129
-692
-255
+500
+59
+702
+185
 unemployement rate
 time
 NIL
@@ -401,10 +401,10 @@ NIL
 HORIZONTAL
 
 BUTTON
-491
-271
-699
-304
+494
+187
+702
+220
 generate simulations for Beveridge curve
 generate-simulations-BC
 NIL
@@ -418,10 +418,10 @@ NIL
 1
 
 PLOT
-490
-418
-1097
-663
+493
+334
+1100
+579
 beveridge_curve
 unemployment_rate
 vacancy_rate
@@ -468,10 +468,10 @@ NIL
 1
 
 SWITCH
-1083
-272
-1183
-305
+1086
+188
+1186
+221
 display_bc
 display_bc
 1
@@ -479,20 +479,20 @@ display_bc
 -1000
 
 TEXTBOX
-925
-271
-1075
-313
+928
+187
+1078
+229
 Turns on or off display while computing the Beveridge curve to speed up the process :
 11
 0.0
 1
 
 SLIDER
-492
-328
-664
-361
+495
+244
+667
+277
 nb_of_U_points
 nb_of_U_points
 2
@@ -504,10 +504,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-492
-362
-664
-395
+495
+278
+667
+311
 nb_of_V_points
 nb_of_V_points
 2
@@ -519,10 +519,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-665
-328
-837
-361
+668
+244
+840
+277
 U_min
 U_min
 10
@@ -534,10 +534,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-838
-328
-1010
-361
+841
+244
+1013
+277
 U_max
 U_max
 U_min
@@ -549,10 +549,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-665
-362
-837
-395
+668
+278
+840
+311
 V_min
 V_min
 10
@@ -564,10 +564,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-838
-362
-1010
-395
+841
+278
+1013
+311
 V_max
 V_max
 V_min
@@ -579,23 +579,23 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-497
-307
-790
-325
+500
+223
+793
+241
 Parameters for the Beveridge curve :
 11
 0.0
 1
 
 SWITCH
-813
-272
-912
-305
+816
+188
+915
+221
 stop_comp
 stop_comp
-1
+0
 1
 -1000
 
@@ -650,10 +650,10 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-719
-273
-818
-301
+722
+189
+821
+217
 Click to cancel the BC computation :
 11
 0.0
@@ -675,10 +675,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-642
-46
-773
-91
+846
+10
+977
+55
 unemployement level
 moving-average
 5
@@ -711,10 +711,10 @@ Percentage of U+V of pairs for the matching procedure at each tick :
 1
 
 PLOT
-693
-128
-895
-255
+703
+58
+905
+185
 average unemployement time
 ticks
 time (ticks)
@@ -729,10 +729,10 @@ PENS
 "default" 1.0 0 -8431303 true "" "plot average-unemployement-duration"
 
 PLOT
-895
-128
-1097
-255
+905
+58
+1107
+185
 average job time
 ticks
 time (ticks)
@@ -747,10 +747,10 @@ PENS
 "default" 1.0 0 -13791810 true "" "plot average-job-duration"
 
 PLOT
-1097
-129
-1298
-255
+1107
+59
+1308
+185
 average vacancy time
 ticks
 time (ticks)
@@ -765,10 +765,10 @@ PENS
 "default" 1.0 0 -13840069 true "" "plot average-vacant-duration"
 
 PLOT
-1300
-129
-1502
-255
+1310
+59
+1512
+185
 Market friction rate
 time
 NIL
@@ -783,10 +783,10 @@ PENS
 "default" 1.0 0 -5825686 true "" "plot friction"
 
 MONITOR
-775
-46
-906
-91
+979
+10
+1110
+55
 unemployement duration
 indic-2
 0
@@ -794,10 +794,10 @@ indic-2
 11
 
 MONITOR
-908
-46
-1039
-91
+1112
+10
+1243
+55
 job duration
 indic-3
 0
@@ -805,10 +805,10 @@ indic-3
 11
 
 MONITOR
-1041
-46
-1172
-91
+1245
+10
+1376
+55
 vacant duration
 indic-4
 0
@@ -816,10 +816,10 @@ indic-4
 11
 
 MONITOR
-1174
-46
-1305
-91
+1378
+10
+1509
+55
 friction
 indic-5
 2
@@ -827,20 +827,20 @@ indic-5
 11
 
 TEXTBOX
-503
-10
-612
-28
+511
+29
+620
+47
 Indicators plots :
 14
 0.0
 1
 
 TEXTBOX
-502
-56
-638
-84
+706
+20
+842
+48
 Indicators' moving averages over the last 100 steps :
 11
 0.0
