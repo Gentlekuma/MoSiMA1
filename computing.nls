@@ -21,8 +21,11 @@ to update-average-job-duration
     set job-time ( job-time + 1 )
   ]
   let job-sum sum [job-time] of persons
-  if nb_of_persons != unemployement_level [
+  ifelse nb_of_persons != unemployement_level [
     set average-job-duration ( job-sum / (nb_of_persons - unemployement_level) )
+  ]
+  [
+    set average-job-duration 0
   ]
 end
 
@@ -31,8 +34,11 @@ to update-average-unemployement-duration
     set unemployement-time ( unemployement-time + 1 )
   ]
   let unemployement-sum sum [unemployement-time] of persons
-  if unemployement_level != 0 [
+  ifelse unemployement_level != 0 [
     set average-unemployement-duration ( unemployement-sum / unemployement_level)
+  ]
+  [
+    set average-unemployement-duration 0
   ]
 end
 
@@ -47,7 +53,7 @@ to update-average-vacant-duration
 end
 
 to update-market-friction
-  set friction nb-failed-matching / nb_of_pairs_considered
+  set friction nb-failed-matching / (min list nb_of_pairs_considered vacancy_level unemployement_level])
   set nb-failed-matching 0
 end
 
