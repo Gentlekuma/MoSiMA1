@@ -203,7 +203,7 @@ number_of_companies
 number_of_companies
 10
 500
-400
+230
 10
 1
 NIL
@@ -465,10 +465,10 @@ NIL
 1
 
 SWITCH
-1261
-11
-1361
-44
+1213
+17
+1313
+50
 display_bc
 display_bc
 1
@@ -476,11 +476,11 @@ display_bc
 -1000
 
 TEXTBOX
-1103
+1090
 10
-1253
-52
-Turns on or off display while computing the Beveridge curve to speed up the process :
+1213
+65
+Turns off display while computing the Beveridge curve to speed up the process :
 11
 0.0
 1
@@ -586,10 +586,10 @@ Parameters for the Beveridge curve :
 1
 
 SWITCH
-991
-11
-1090
-44
+979
+10
+1078
+43
 stop_comp
 stop_comp
 1
@@ -647,10 +647,10 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-897
-12
-996
-40
+885
+11
+984
+39
 Click to cancel the BC computation :
 11
 0.0
@@ -672,10 +672,10 @@ NIL
 HORIZONTAL
 
 MONITOR
-663
-264
-865
-309
+662
+278
+864
+323
 average u from the last 100 steps
 moving-average
 5
@@ -691,7 +691,7 @@ converge-criteria
 converge-criteria
 0
 1
-0.1
+0.05
 0.05
 1
 percents
