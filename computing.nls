@@ -54,7 +54,7 @@ end
 
 to update-market-friction
   let div (min ( list nb_of_pairs_considered vacancy_level unemployement_level) )
-  if div !=0 [
+  if div != 0 [
       set friction nb-failed-matching / div
   ]
   set nb-failed-matching 0
