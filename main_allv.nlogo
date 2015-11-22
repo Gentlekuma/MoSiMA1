@@ -5,7 +5,6 @@ __includes[
   "beveridge.nls"
   "matching_procedures_allv.nls" "matching_procedures_v1.nls" "matching_procedures_v2.nls"
   "job_procedures_allv.nls" "job_procedures_v1.nls" "job_procedures_v2.nls"
-  "resigning_procedures_v2.nls"
   ]
 
 globals [
@@ -24,6 +23,7 @@ globals [
   max_salary
   nb_of_locations_possibles
   maximum_productivity_fluctuation
+  maximum_statisfaction_fluctuation
   minimum_similarity_required
   minimum_productivity_required
   exceptional_firing
@@ -65,8 +65,8 @@ breed [persons person]
 breed [companies company]
 breed [matching matching-agent]
 
-persons-own [skills location salary reference_productivity employed employer experience specialization strong-matching job-time unemployement-time]
-companies-own [skills location salary job_filled employee experience_required field strong-matching vacant-time]
+persons-own [skills location salary reference_productivity minimum_satisfaction_required employed employer experience specialization strong-matching job-time unemployement-time]
+companies-own [skills location salary reference_satisfaction job_filled employee experience_required field strong-matching vacant-time]
 
 
 
@@ -260,10 +260,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-9
-609
-191
-642
+3
+570
+185
+603
 number_of_locations_possibles
 number_of_locations_possibles
 1
@@ -438,10 +438,10 @@ PENS
 "pen-0" 1.0 0 -2674135 true "" ""
 
 SLIDER
-8
-571
-191
-604
+217
+494
+400
+527
 number_of_field_possibles
 number_of_field_possibles
 1
@@ -849,19 +849,55 @@ Indicators' moving averages over the last 100 steps :
 1
 
 SLIDER
-220
-489
-426
-522
+205
+567
+418
+600
+max_satisfaction_fluctuation
+max_satisfaction_fluctuation
+0
+1
+0.3
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+207
+531
+417
+564
 random_resigning_chances
 random_resigning_chances
 0
 1
-0.2
-0.05
+0
+0.1
 1
 NIL
 HORIZONTAL
+
+SWITCH
+206
+608
+355
+641
+random_resignation
+random_resignation
+1
+1
+-1000
+
+TEXTBOX
+219
+475
+369
+493
+version 2 parameters
+12
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
