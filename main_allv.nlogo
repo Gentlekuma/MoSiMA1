@@ -639,8 +639,8 @@ SLIDER
 454
 189
 487
-except_motivation_chance
-except_motivation_chance
+exceptional_motivation_chances
+exceptional_motivation_chances
 0
 1
 0.1
