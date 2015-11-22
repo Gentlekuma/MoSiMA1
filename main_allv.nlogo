@@ -1,4 +1,11 @@
-__includes[ "setup2.1.nls" "display.nls" "matching_procedures2.1.nls" "matching_procedures.nls"  "job_procedures2.1.nls" "job_procedures.nls" "computing.nls" "beveridge.nls"]
+__includes[
+  "setup_allv.nls"
+  "display.nls"
+  "computing.nls"
+  "beveridge.nls"
+  "matching_procedures_allv.nls" "matching_procedures_v1.nls" "matching_procedures_v2.nls"
+  "job_procedures_allv.nls" "job_procedures_v1.nls" "job_procedures_v2.nls"
+  ]
 
 globals [
 
@@ -80,6 +87,7 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                     RESET TO DEFAULT PARAMETERS                      ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 to reset
   reset-globals
   setup
@@ -95,19 +103,7 @@ to go
 
   if ticks >= timeout or convergence [stop]
 
-  ifelse version = 1
-  [
-    agents-matching
-  ]
-  [
-    ifelse version = 2 [
-      agents-matching-2
-    ]
-    [
-      ;agents-matching 3
-    ]
-  ]
-
+  agents-matching
   update-jobs
   compute-values
   stock-last-values
