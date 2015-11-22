@@ -145,5 +145,6 @@ to reset-globals
   set exceptional_matching 0.7
   set timeout 1000
   set converge-criteria 0.05
+  set unexpected_firing 0.1
 end
 

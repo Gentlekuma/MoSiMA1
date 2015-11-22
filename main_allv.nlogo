@@ -331,7 +331,7 @@ unexpected_firing
 unexpected_firing
 0
 1
-0.9
+0.1
 0.1
 1
 NIL
