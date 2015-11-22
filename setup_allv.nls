@@ -100,13 +100,15 @@ end
 
 ; procédure qui fixe la valeur de référence de la productivité de l'employé au hasard selon une loi normale (pour le pas avoir de valeurs trop extrèmes)
 to set-productivity
-  ;set reference_productivity random-normal 0.7 0.3
-  ;if reference_productivity < 0 [
-  ;  set reference_productivity 0
-  ;]
-  ;if reference_productivity > 1 [
-  ;  set reference_productivity 1
-  ;]
+  set reference_productivity random-normal 0.7 0.3
+  
+  if reference_productivity < 0 [
+    set reference_productivity 0
+  ]
+  if reference_productivity > 1 [
+    set reference_productivity 1
+  ]
+  ;set reference_productivity random-float 1
 end
 
 ; procédure qui fixe le domaine de l'entreprise

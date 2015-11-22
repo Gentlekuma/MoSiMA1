@@ -63,7 +63,7 @@ breed [persons person]
 breed [companies company]
 breed [matching matching-agent]
 
-persons-own [skills location salary productivity employed employer experience specialization strong-matching job-time unemployement-time]
+persons-own [skills location salary reference_productivity employed employer experience specialization strong-matching job-time unemployement-time]
 companies-own [skills location salary job_filled employee experience_required field strong-matching vacant-time]
 
 
@@ -221,7 +221,7 @@ number_of_pairs_considered
 number_of_pairs_considered
 0
 100
-50
+30
 1
 1
 (percentage of U+V)
@@ -425,7 +425,7 @@ PLOT
 beveridge_curve
 unemployment_rate
 vacancy_rate
-0.5
+0.0
 1.0
 0.0
 3.0
@@ -595,7 +595,7 @@ SWITCH
 221
 stop_comp
 stop_comp
-0
+1
 1
 -1000
 

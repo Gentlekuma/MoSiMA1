@@ -9,7 +9,6 @@ to hiring_procedure_v1 [person company similarity]
     set color color-person-employed
     set employed True
     set employer company
-    set productivity 1
     set strong-matching similarity > strong-matching-treshold
     set unemployement-time 0
     create-link-with company
