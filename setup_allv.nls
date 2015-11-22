@@ -18,7 +18,7 @@ to setup-globals
   set exceptional_worker_motivation unexpected_worker_motivation
   set nb_of_field_possibles number_of_field_possibles
   set maximum_productivity_fluctuation max_productivity_fluctuation
-  set exceptional_motivation_event except_motivation_chance
+  set exceptional_motivation_event exceptional_motivation_chances
   set strong-matching-treshold exceptional_matching
   ; autres variables 
   set timeout 1000
@@ -143,7 +143,7 @@ to reset-globals
   set V_min 100
   set U_max 400
   set V_max 400
-  set except_motivation_chance 0.1
+  set exceptional_motivation_chances 0.1
   set exceptional_matching 0.7
   set timeout 1000
   set converge-criteria 0.05
