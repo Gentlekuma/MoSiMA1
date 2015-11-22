@@ -1,0 +1,13 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                         MATCHING PROCEDURES                          ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; procédure qui fait que les agnet son une chance de démisionner à chaque tour
+; 
+to-report resigning_random_v2 [person]
+  ifelse random-float 1 < random_resigning_threshold [
+    firing_procedure_v2 person [employer] of person
+    report 1
+  ] [
+  report 0]
+end
