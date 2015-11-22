@@ -3,7 +3,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-to agents-matching-2 ;;TODO : rajout des fonctions supplémentaires
+to agents-matching_v2 ;;TODO : rajout des fonctions supplémentaires
   ask matching [
     let nb_of_matches min (list nb_of_pairs_considered
                                   count persons with [not employed]
@@ -15,7 +15,7 @@ to agents-matching-2 ;;TODO : rajout des fonctions supplémentaires
       set random-person one-of persons with [not employed]
       set random-company one-of companies with [not job_filled]
       ifelse compare-2 random-person random-company [
-        hiring_procedure-2 random-person random-company
+        hiring_procedure_v2 random-person random-company
       ]
       [
         set nb-failed-matching ( nb-failed-matching + 1 )

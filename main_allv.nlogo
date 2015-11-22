@@ -1,7 +1,13 @@
-__includes[ "setup.nls" "display.nls" "matching_procedures.nls" "job_procedures.nls" "computing.nls" "beveridge.nls"]
+__includes[
+  "setup_allv.nls"
+  "display.nls"
+  "computing.nls"
+  "beveridge.nls"
+  "matching_procedures_allv.nls" "matching_procedures_v1.nls" "matching_procedures_v2.nls"
+  "job_procedures_allv.nls" "job_procedures_v1.nls" "job_procedures_v2.nls"
+  ]
 
 globals [
-  timeout
 
   ; affichage
   color-person-employed
@@ -16,22 +22,36 @@ globals [
   min_salary
   max_salary
   nb_of_locations_possibles
-  max_productivity_fluctuation
+  maximum_productivity_fluctuation
   minimum_similarity_required
   minimum_productivity_required
   exceptional_firing
   exceptional_company_motivation
   exceptional_worker_motivation
-  exceptional_event_proba
+  nb_of_field_possibles
+  exceptional_motivation_event ; to reste
+  strong-matching-treshold ; to reset
 
   ; mesures
-  labor_force
   unemployement_level
   unemployement_rate
   vacancy_level
   vacancy_rate
-
-  ; variable pour la convergence
+  moving-average
+  average-job-duration
+  average-unemployement-duration
+  average-vacant-duration
+  nb-failed-matching
+  friction
+  last-values-indic2
+  last-values-indic3
+  last-values-indic4
+  last-values-indic5
+  indic-2
+  indic-3
+  indic-4
+  indic-5
+  ; variables pour la convergence
   convergence
   last-values-unemployement
   last-values-vacancy
@@ -43,8 +63,8 @@ breed [persons person]
 breed [companies company]
 breed [matching matching-agent]
 
-persons-own [skills location salary reference_productivity employed employer]
-companies-own [skills location salary job_filled employee]
+persons-own [skills location salary productivity employed employer experience specialization strong-matching job-time unemployement-time]
+companies-own [skills location salary job_filled employee experience_required field strong-matching vacant-time]
 
 
 
@@ -64,8 +84,14 @@ to setup
   reset-ticks
 end
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                     RESET TO DEFAULT PARAMETERS                      ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
+to reset
+  reset-globals
+  setup
+end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                 GO                                   ;;
@@ -79,56 +105,20 @@ to go
 
   agents-matching
   update-jobs
-
   compute-values
-  compute-convergence
+  stock-last-values
 
   tick
 end
-
-; procédure de matching
-; l'agent MATCHING va considérer à chaque tour au maximum nb_of_pairs_considered et calculer la similarité entre l'entreprise et le condidat et déclencher la procédure d'embauche le cas échéant
-to agents-matching
-  ask matching [
-    let nb_of_matches min (list nb_of_pairs_considered
-                                  count persons with [not employed]
-                                  count companies with [not job_filled])
-    let random-person nobody
-    let random-company nobody
-    repeat nb_of_matches [
-      set random-person one-of persons with [not employed]
-      set random-company one-of companies with [not job_filled]
-      if compare random-person random-company [
-        hiring_procedure random-person random-company
-      ]
-    ]
-  ]
-end
-
-; procédure qui a chaque tour, décide des productivité des employé et de si ils se font licencier ou non
-; on considère le paramètre exceptional_firing comme une augmentation des attentes de l'employeur qui a une probabilité d'arriver de exceptional_event_probability
-to update-jobs
-  ask persons [
-    if employed [
-      let productivity compute-productivity
-      if ( random-float 1 < exceptional_event_proba) [
-        set productivity productivity - exceptional_firing
-      ]
-      if productivity < minimum_productivity_required [
-        firing_procedure [employee] of employer employer
-      ]
-    ]
-  ]
-end
 @#$#@#$#@
 GRAPHICS-WINDOW
-456
-10
-925
-500
+191
+212
+487
+517
 25
-25
-9.0
+24
+5.61
 1
 14
 1
@@ -140,8 +130,8 @@ GRAPHICS-WINDOW
 1
 -25
 25
--25
-25
+-24
+24
 1
 1
 1
@@ -149,10 +139,10 @@ ticks
 30.0
 
 BUTTON
-8
-28
-77
-61
+193
+10
+262
+43
 setup
 setup
 NIL
@@ -166,10 +156,10 @@ NIL
 1
 
 BUTTON
-90
-28
-157
-61
+331
+10
+398
+43
 go
 go
 T
@@ -183,20 +173,20 @@ NIL
 0
 
 TEXTBOX
-26
-273
-177
-291
-Matching settings
+11
+368
+162
+386
+Matching settings :
 11
 0.0
 0
 
 SLIDER
-17
-106
-199
-139
+5
+32
+187
+65
 number_of_persons
 number_of_persons
 10
@@ -208,10 +198,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-17
-149
-199
-182
+5
+67
+187
+100
 number_of_companies
 number_of_companies
 10
@@ -223,55 +213,55 @@ NIL
 HORIZONTAL
 
 SLIDER
-21
-293
-231
-326
+7
+520
+189
+553
 number_of_pairs_considered
 number_of_pairs_considered
 0
 100
-10
+30
 1
 1
-NIL
+(percentage of U+V)
 HORIZONTAL
 
 SLIDER
-248
-150
-435
-183
+6
+333
+188
+366
 minimum_salary
 minimum_salary
 500
 1500
 500
-1
+100
 1
 NIL
 HORIZONTAL
 
 SLIDER
-249
-107
-435
-140
+6
+298
+188
+331
 maximum_salary
 maximum_salary
 2000
 10000
 3000
-1
+100
 1
 NIL
 HORIZONTAL
 
 SLIDER
-248
+9
+609
 191
-435
-224
+642
 number_of_locations_possibles
 number_of_locations_possibles
 1
@@ -283,70 +273,60 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-251
-86
-405
-104
-Personal preferences settings
-11
-0.0
-1
-
-SLIDER
-246
-294
-449
-327
-matching_quality_threshold
-matching_quality_threshold
-0
-1
-0.5
-0.1
-1
-NIL
-HORIZONTAL
-
-TEXTBOX
-22
-83
-172
-101
-System settings
-11
-0.0
-1
-
-TEXTBOX
-25
-392
-175
-410
-Productivity settings
-11
-0.0
-1
-
-SLIDER
-20
-411
+8
+283
 200
-444
-firing_quality_threshold
-firing_quality_threshold
-0
+301
+Agents' personal preferences settings :\n
+11
+0.0
 1
-0.5
-0.1
-1
-NIL
-HORIZONTAL
 
 SLIDER
-20
+7
+419
+189
 452
-200
-485
+matching_quality_threshold
+matching_quality_threshold
+0
+1
+0.5
+0.1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+14
+10
+187
+28
+Original System settings :
+14
+0.0
+1
+
+SLIDER
+5
+103
+187
+136
+firing_quality_threshold
+firing_quality_threshold
+0
+1
+0.5
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+5
+139
+187
+172
 unexpected_firing
 unexpected_firing
 0
@@ -358,10 +338,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-18
-331
-231
-364
+6
+209
+187
+242
 unexpected_company_motivation
 unexpected_company_motivation
 0
@@ -373,10 +353,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-246
-333
-449
-366
+5
+244
+187
+277
 unexpected_worker_motivation
 unexpected_worker_motivation
 0
@@ -388,10 +368,10 @@ NIL
 HORIZONTAL
 
 PLOT
-943
-72
-1299
-222
+490
+129
+692
+255
 unemployement rate
 time
 NIL
@@ -400,47 +380,31 @@ NIL
 0.0
 1.0
 true
-true
+false
 "" ""
 PENS
-"unemployement_rate" 1.0 0 -14070903 true "" "plot unemployement_rate"
-"vacancy_rate" 1.0 0 -955883 true "" "plot vacancy_rate"
+"vacancy_rate" 1.0 0 -955883 true "" "plot unemployement_rate"
 
 SLIDER
-228
-410
-432
-443
-maximum_productivity_fluctuation
-maximum_productivity_fluctuation
+5
+174
+187
+207
+max_productivity_fluctuation
+max_productivity_fluctuation
 0
 0.5
-0
+0.3
 0.1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-15
-192
-241
-225
-unexpectedl_event_probability
-unexpectedl_event_probability
-0
-1
-0.1
-0.05
 1
 NIL
 HORIZONTAL
 
 BUTTON
-982
-17
-1240
-50
+491
+271
+699
+304
 generate simulations for Beveridge curve
 generate-simulations-BC
 NIL
@@ -454,13 +418,342 @@ NIL
 1
 
 PLOT
-958
-232
-1272
-476
+490
+418
+1097
+663
 beveridge_curve
 unemployment_rate
 vacancy_rate
+0.5
+1.0
+0.0
+3.0
+true
+false
+"" ""
+PENS
+"pen-0" 1.0 0 -2674135 true "" ""
+
+SLIDER
+8
+571
+191
+604
+number_of_field_possibles
+number_of_field_possibles
+1
+10
+5
+1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+265
+10
+328
+43
+reset
+reset
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SWITCH
+1083
+272
+1183
+305
+display_bc
+display_bc
+1
+1
+-1000
+
+TEXTBOX
+925
+271
+1075
+313
+Turns on or off display while computing the Beveridge curve to speed up the process :
+11
+0.0
+1
+
+SLIDER
+492
+328
+664
+361
+nb_of_U_points
+nb_of_U_points
+2
+100
+4
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+492
+362
+664
+395
+nb_of_V_points
+nb_of_V_points
+2
+100
+4
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+665
+328
+837
+361
+U_min
+U_min
+10
+1000
+100
+10
+1
+NIL
+HORIZONTAL
+
+SLIDER
+838
+328
+1010
+361
+U_max
+U_max
+U_min
+1000
+400
+10
+1
+NIL
+HORIZONTAL
+
+SLIDER
+665
+362
+837
+395
+V_min
+V_min
+10
+1000
+100
+10
+1
+NIL
+HORIZONTAL
+
+SLIDER
+838
+362
+1010
+395
+V_max
+V_max
+V_min
+1000
+400
+10
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+497
+307
+790
+325
+Parameters for the Beveridge curve :
+11
+0.0
+1
+
+SWITCH
+813
+272
+912
+305
+stop_comp
+stop_comp
+1
+1
+-1000
+
+SLIDER
+7
+384
+189
+417
+exceptional_matching
+exceptional_matching
+0
+1
+0.7
+0.05
+1
+NIL
+HORIZONTAL
+
+CHOOSER
+401
+10
+493
+55
+version
+version
+1 2
+0
+
+TEXTBOX
+19
+552
+169
+586
+Additional parameters :
+14
+0.0
+1
+
+SLIDER
+7
+454
+189
+487
+except_motivation_chance
+except_motivation_chance
+0
+1
+0.1
+0.05
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+719
+273
+818
+301
+Click to cancel the BC computation :
+11
+0.0
+1
+
+SLIDER
+255
+92
+428
+125
+timeout
+timeout
+500
+10000
+1000
+100
+1
+NIL
+HORIZONTAL
+
+MONITOR
+642
+46
+773
+91
+unemployement level
+moving-average
+5
+1
+11
+
+SLIDER
+255
+126
+428
+159
+converge-criteria
+converge-criteria
+0
+1
+0.05
+0.05
+1
+percents
+HORIZONTAL
+
+TEXTBOX
+8
+491
+185
+518
+Percentage of U+V of pairs for the matching procedure at each tick :
+11
+0.0
+1
+
+PLOT
+693
+128
+895
+255
+average unemployement time
+ticks
+time (ticks)
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -8431303 true "" "plot average-unemployement-duration"
+
+PLOT
+895
+128
+1097
+255
+average job time
+ticks
+time (ticks)
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -13791810 true "" "plot average-job-duration"
+
+PLOT
+1097
+129
+1298
+255
+average vacancy time
+ticks
+time (ticks)
 0.0
 1.0
 0.0
@@ -469,7 +762,89 @@ true
 false
 "" ""
 PENS
-"pen-0" 1.0 0 -16777216 true "" ""
+"default" 1.0 0 -13840069 true "" "plot average-vacant-duration"
+
+PLOT
+1300
+129
+1502
+255
+Market friction rate
+time
+NIL
+0.0
+10.0
+0.0
+1.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -5825686 true "" "plot friction"
+
+MONITOR
+775
+46
+906
+91
+unemployement duration
+indic-2
+0
+1
+11
+
+MONITOR
+908
+46
+1039
+91
+job duration
+indic-3
+0
+1
+11
+
+MONITOR
+1041
+46
+1172
+91
+vacant duration
+indic-4
+0
+1
+11
+
+MONITOR
+1174
+46
+1305
+91
+friction
+indic-5
+2
+1
+11
+
+TEXTBOX
+503
+10
+612
+28
+Indicators plots :
+14
+0.0
+1
+
+TEXTBOX
+502
+56
+638
+84
+Indicators' moving averages over the last 100 steps :
+11
+0.0
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

@@ -1,0 +1,45 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                      UPDATING JOBS AND PRODUCTIVITY                  ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; fonction qui calcule la productivité d'une PERSON à chaque tour
+to-report compute-productivity   
+  
+  let temp productivity + (random-float (2) - 1) * maximum_productivity_fluctuation
+  ifelse temp > 1[
+    report 1
+  ]
+  [
+    report temp
+  ]
+end
+
+
+; procédure qui a chaque tour, décide des productivités des employés et de si ils se font licencier ou non
+; on considère le paramètre exceptional_firing comme une augmentation des attentes de l'employeur qui a une probabilité d'arriver de exceptional_event_probability
+to update-jobs
+  ask persons [
+    if employed [
+      set experience experience + 1
+      set productivity compute-productivity
+
+      if ( (random-float 1 <= exceptional_firing) or (productivity < minimum_productivity_required) ) 
+      [
+        ifelse version = 1
+          [
+            firing_procedure_v1 [employee] of employer employer
+          ]
+          [
+            ifelse version = 2 
+            [
+              firing_procedure_v2 [employee] of employer employer
+            ]
+            [
+              ;firing_procedure_v3 [employee] of employer employer
+            ]
+          ]
+      ]
+    ]
+  ]
+end
+

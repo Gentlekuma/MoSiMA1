@@ -4,12 +4,12 @@
 
 ; procédure d'embauche
 ; on met à jour les attributs des agents
-to hiring_procedure-2 [person company]
+to hiring_procedure_v2 [person company]
   ask person [
     set color color-person-employed
     set employed True
     set employer company
-    update-specialization
+    update-specialization_v2
     create-link-with company
   ]
   ask company [
@@ -21,7 +21,7 @@ end
 
 ; procédure de licenciement
 ; on met à jour les attributs des agents
-to firing_procedure-2 [person company]
+to firing_procedure_v2 [person company]
   ask person [
     set color color-person-unemployed
     set employed False
@@ -37,7 +37,7 @@ to firing_procedure-2 [person company]
 end
 
 ; procedure qui met à jour l'attirbut specilization d'un employé lorsque celui-ci trouve un travail dans un certain domaine
-to update-specialization
+to update-specialization_v2
   let field_of_company [field] of employer 
   let old_specilization_value item field_of_company specialization 
   let new_specialization_value old_specilization_value + 1
