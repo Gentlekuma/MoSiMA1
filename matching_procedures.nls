@@ -11,6 +11,7 @@ to agents-matching
                                   count companies with [not job_filled])
     let random-person nobody
     let random-company nobody
+    set nb-failed-matching 0
     repeat nb_of_matches [
       set random-person one-of persons with [not employed]
       set random-company one-of companies with [not job_filled]
@@ -21,6 +22,11 @@ to agents-matching
       [
         set nb-failed-matching ( nb-failed-matching + 1 )
       ]
+    ]
+    ifelse nb_of_matches = 0 [
+      set friction 0
+    ] [
+      set friction nb-failed-matching / nb_of_matches
     ]
   ]
 end
