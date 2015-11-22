@@ -236,7 +236,7 @@ minimum_salary
 minimum_salary
 500
 1500
-500
+1500
 100
 1
 NIL
@@ -249,9 +249,9 @@ SLIDER
 331
 maximum_salary
 maximum_salary
-2000
+1500
 10000
-3000
+1500
 100
 1
 NIL
