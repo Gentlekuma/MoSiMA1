@@ -6,6 +6,7 @@ __includes[
   "matching_procedures_allv.nls" "matching_procedures_v1.nls" "matching_procedures_v2.nls"
   "job_procedures_allv.nls" "job_procedures_v1.nls" "job_procedures_v2.nls"
   "matching_function.nls"
+  "open_system.nls"
   ]
 
 globals [
@@ -62,6 +63,11 @@ globals [
   ;variable pour la fonction d'appariement
   fraction_of_applicants
 
+  ;variables pour l'ouverture du système
+  life_expectancy
+  initial_nb_of_persons
+  birth_rate
+
 
   nb-of-step-remembered ; nombre de pas pris en compte dans le calcul de la convergence
   convergence-margin ; marge de mouvements possibles en dessous de laquelle on considère que le système a convergé
@@ -71,7 +77,7 @@ breed [persons person]
 breed [companies company]
 breed [matching matching-agent]
 
-persons-own [skills location salary reference_productivity minimum_satisfaction_required employed employer experience specialization strong-matching job-time unemployement-time]
+persons-own [skills location salary reference_productivity minimum_satisfaction_required employed employer experience specialization strong-matching job-time unemployement-time age]
 companies-own [skills location salary reference_satisfaction job_filled employee experience_required field strong-matching vacant-time]
 
 
@@ -116,6 +122,9 @@ to go
   update-jobs
   compute-values
   stock-last-values
+  if version = 3 [
+    update-agents
+  ]
 
   tick
 end
@@ -429,7 +438,7 @@ NIL
 PLOT
 493
 334
-805
+1013
 579
 beveridge_curve
 unemployment_rate
@@ -630,8 +639,8 @@ CHOOSER
 55
 version
 version
-1 2
-0
+1 2 3
+2
 
 SLIDER
 6
@@ -926,11 +935,69 @@ fraction_of_applying_persons
 fraction_of_applying_persons
 0
 1
-0.7
+0
 0.05
 1
 NIL
 HORIZONTAL
+
+TEXTBOX
+1051
+445
+1201
+463
+Version 3 parameters :
+12
+0.0
+1
+
+SLIDER
+1059
+478
+1236
+511
+age_of_retirement
+age_of_retirement
+40
+100
+70
+5
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1060
+521
+1234
+554
+renewal_rate
+renewal_rate
+0
+0.20
+0.05
+0.01
+1
+NIL
+HORIZONTAL
+
+PLOT
+1060
+242
+1260
+392
+nb agents
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count persons"
 
 @#$#@#$#@
 ## WHAT IS IT?
@@ -949,7 +1016,6 @@ Dans les paramètres de la simulation, il est possible de choisir la version du 
 -	La version 1 correspond au modèle de base, tel qu'on l'obtient à la fin de la partie 1 du projet.
 -	La version 2 correspond au modèle amélioré, incluant l'ajout de critères d'appariement (question 2.1) et du processus de démission (question 2.3)
 -	La version 3 correspond au modèle amélioré (question 2.4). elle comporte aussi les améliorations de la version 2.
-
 @#$#@#$#@
 default
 true
