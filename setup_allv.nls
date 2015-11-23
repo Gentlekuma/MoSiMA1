@@ -143,9 +143,9 @@ to set-satisfaction
   ]
 end
 
-; procédure qui fixe l'age d'un agents au hasard entre 20 ans et l'age de la retraite
+; procédure qui fixe l'age d'un agents au hasard entre 0 ans et l'age de la retraite
 to set-age
-  set age 20 + random (life_expectancy - 20)
+  set age random life_expectancy
 end
 
 ; procédure qui fixe le domaine de l'entreprise
@@ -189,6 +189,6 @@ to reset-globals
   set unexpected_firing 0.1
   set fraction_of_applying_persons 0.
   set age_of_retirement 60
-  set renewal_rate 0.1
+  set renewal_rate 0.05
 end
 
