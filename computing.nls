@@ -6,6 +6,7 @@
 to compute-values
   set unemployement_level count persons with [not employed]
   set vacancy_level count companies with [not job_filled]
+  set nb_of_persons count persons
   set unemployement_rate unemployement_level / nb_of_persons
   set vacancy_rate vacancy_level / nb_of_persons
   
