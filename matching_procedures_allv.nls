@@ -13,11 +13,8 @@ to agents-matching
     [
       agents-matching_v1
     ]
-    [
-      if version = 2 
-        [
-          agents-matching_v2
-        ]
+    [ ; pour les version 2 et 3 
+       agents-matching_v2
     ]
   ]
   
