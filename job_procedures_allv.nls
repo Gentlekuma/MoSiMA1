@@ -6,6 +6,7 @@
 ; procédure qui a chaque tour, décide des productivités des employés et de si ils se font licencier ou non et dans le cas de la version 2 si ils veulent démisionner
 to update-jobs
   ask persons [
+    set age age + 1
     if not strong-matching [
       if employed [
         set experience experience + 1
@@ -15,20 +16,18 @@ to update-jobs
             firing_procedure self employer
           ]
         ] 
-        [
-          if version = 2 [
-            ifelse random_resignation [
-              let productivity compute-productivity
-              if ( (random-float 1 <= exceptional_firing) or (productivity < minimum_productivity_required) or (random-float 1 < random_resigning_threshold) ) [
-                firing_procedure self employer
-              ]
-            ] 
-            [
-              let productivity compute-productivity
-              let satisfaction compute-satisfaction employer
-              if ( (random-float 1 <= exceptional_firing) or (productivity < minimum_productivity_required) or (satisfaction < [minimum_satisfaction_required] of self) ) [
-                firing_procedure self employer
-              ]
+        [ ; pour les version 2 et 3
+          ifelse random_resignation [
+            let productivity compute-productivity
+            if ( (random-float 1 <= exceptional_firing) or (productivity < minimum_productivity_required) or (random-float 1 < random_resigning_threshold) ) [
+              firing_procedure self employer
+            ]
+          ] 
+          [
+            let productivity compute-productivity
+            let satisfaction compute-satisfaction employer
+            if ( (random-float 1 <= exceptional_firing) or (productivity < minimum_productivity_required) or (satisfaction < [minimum_satisfaction_required] of self) ) [
+              firing_procedure self employer
             ]
           ]
         ]
