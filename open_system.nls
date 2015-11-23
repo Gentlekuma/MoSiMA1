@@ -1,0 +1,38 @@
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                       OPEN SYSTEM PROCEDURES                         ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+; procédure de mise à jours des agents dans le systèmes
+; on enlève les agents trop vieux, et on rajoute de nouveaux
+to update-agents
+  let nb_of_deaths 0
+  ask persons with [age > life_expectancy ] [
+    if [employed] of self [
+      firing_procedure self [employer] of self
+    ]
+    set nb_of_deaths nb_of_deaths + 1    
+    die
+  ]  
+  
+  let nb_of_births round (birth_rate * initial_nb_of_persons)
+   create-persons nb_of_births [
+    set color color-person-unemployed
+    set size 2
+    set-random-skills-location-salary
+    set-productivity
+    set-satisfaction-required
+    set-initial-specialization
+    set experience 0
+    set employed False
+    set employer nobody
+    set job-time 0
+    set unemployement-time 0
+    set strong-matching false
+    set-age
+    set-xy
+  ]
+
+
+end
