@@ -3,12 +3,17 @@
 ;;                            BEVERIDGE CURVE                           ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; procédure de génération de la courbe de Beveridge
+; pour tous les point U et V, défnis selon le nombre de points voulus et leur maximum et minimum respectifs, fixés selon l'interface graphique
+; pour chaque U et V, on lance une simulation avec Uinitial et Vinitial
+; une fois que celle simulation a convergé, on récupère les valeur de U et V finales et on les trace sur la courbe
 to generate-simulations-BC
   clear-all
   
   set-current-plot "beveridge_curve"
   set-current-plot-pen "pen-0"
   set-plot-pen-mode 2
+ 
  
   let step_U round ((U_max - U_min) / (nb_of_U_points - 1))
   let list_U n-values nb_of_U_points [step_U * ? + U_min]
@@ -56,6 +61,7 @@ to generate-simulations-BC
   display
 end
 
+; procédure de réinitialisation entre les simulation pour la courbe de Beveridge
 to setup-simulations [initialU initialV]
 
   clear-turtles
