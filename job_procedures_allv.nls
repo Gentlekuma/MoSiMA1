@@ -3,8 +3,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-; procédure qui a chaque tour, décide des productivités des employés et de si ils se font licencier ou non
-; on considère le paramètre exceptional_firing comme une augmentation des attentes de l'employeur qui a une probabilité d'arriver de exceptional_event_probability
+; procédure qui a chaque tour, décide des productivités des employés et de si ils se font licencier ou non et dans le cas de la version 2 si ils veulent démisionner
 to update-jobs
   ask persons [
     if not strong-matching [
