@@ -2,8 +2,9 @@
 ;;                         MATCHING PROCEDURES                          ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; procédure de matching
-; l'agent MATCHING va considérer à chaque tour au maximum nb_of_pairs_considered et calculer la similarité entre l'entreprise et le candidat et déclencher la procédure d'embauche le cas échéant
+; procédure de matching de la version 1
+; l'agent MATCHING va considérer à chaque tour au maximum nb_of_pairs_considered et calculer la similarité entre l'entreprise et le candidat 
+; le cas échéant, il va déclencher la procédure d'embauche
 to agents-matching_v1
   ask matching [
     let nb_of_matches min (list nb_of_pairs_considered
@@ -61,7 +62,7 @@ end
 ; renvoie un nombre entre 0 et 1
 ;actuellement les deux fonctions sont semblables, comme le veut l'article, mais il sera possible de les différencier pour améliorer le modèle par la suite
 ; on considère que la motivation execptionnelle intervient à ce niveau pour faire augmenter les chances que l'entreprise accepte cet employé
-; elle a une probabilité d'arriver de exceptional_event_proba
+; elle a une probabilité d'arriver de exceptional_motivation_event
 to-report compute-similarity-company_v1 [person company]
   let similarity_skills compute-similarity_skills [skills] of company [skills] of person
   let similarity_location compute-similarity_location [location] of company [location] of person
