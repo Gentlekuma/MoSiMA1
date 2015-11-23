@@ -1,0 +1,19 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;                         MATCHING PROCEDURES                          ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; procédure de matching qui applique la fonction d'appariement et ne prend pas compte des attributs des agents
+to agents-matching_with_matching_function
+  ask matching [
+    if vacancy_level != 0 [
+      let exponent (- fraction_of_applicants * unemployement_level / vacancy_level)
+      let nb_of_matches vacancy_level * (1 - e ^ exponent)
+      repeat round (nb_of_matches) [
+        let random-person one-of persons with [not employed]
+        let random-company one-of companies with [not job_filled]
+        hiring_procedure_v1 random-person random-company 0
+      ]
+      set friction (1 - nb_of_matches / (fraction_of_applicants * unemployement_level))
+    ]
+  ]
+end
