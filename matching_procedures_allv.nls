@@ -3,6 +3,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+; procédure qui a chaque tour, lance la procédure d'appariement en fonction de la version voulue
 to agents-matching
   ifelse version = 1
     [
@@ -21,20 +22,11 @@ to agents-matching
 end
 
 
-; fonction qui se charge de comparer les exigences d'une PERSON et d'une COMPANY
-; renvoie la valeur aggrégée de la similarity
-to-report compute-similarity-value [person company]
-  let similarity-person compute-similarity-person person company
-  let similarity-company compute-similarity-company person company
-  let similarity mean List similarity-person similarity-company
-  report similarity
-end
-
 ; fonction qui calcule la valeur de la similarité du point de vue de l'employé
 ; renvoie un nombre entre 0 et 1
-;actuellement les deux fonctions sont semblables, comme le veut l'article, mais il sera possible de les différencier pour améliorer le modèle par la suite
-; on considère que la motivation execptionnelle intervient à ce niveau pour faire augmenter les chances que la personne accepte ce travail
-; elle a une probabilité d'arriver de exceptional_event_proba
+; actuellement les deux fonctions sont semblables, comme le veut l'article, mais il sera possible de les différencier pour améliorer le modèle par la suite
+; on considère que la motivation exceptionnelle intervient à ce niveau pour faire augmenter les chances que la personne accepte ce travail
+; elle a une probabilité d'arriver de exceptional_motivation_event
 to-report compute-similarity-person [person company]
   let similarity_skills compute-similarity_skills [skills] of person [skills] of company
   let similarity_location compute-similarity_location [location] of person [location] of company
@@ -49,8 +41,8 @@ end
 ; fonction qui calcule la valeur de la similarité du point de vue de l'entreprise
 ; renvoie un nombre entre 0 et 1
 ;actuellement les deux fonctions sont semblables, comme le veut l'article, mais il sera possible de les différencier pour améliorer le modèle par la suite
-; on considère que la motivation execptionnelle intervient à ce niveau pour faire augmenter les chances que l'entreprise accepte cet employé
-; elle a une probabilité d'arriver de exceptional_event_proba
+; on considère que la motivation exceptionnelle intervient à ce niveau pour faire augmenter les chances que l'entreprise accepte cet employé
+; elle a une probabilité d'arriver de exceptional_motivation_event
 to-report compute-similarity-company [person company]
   let similarity_skills compute-similarity_skills [skills] of company [skills] of person
   let similarity_location compute-similarity_location [location] of company [location] of person
