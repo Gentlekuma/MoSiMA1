@@ -2,6 +2,7 @@
 ;;                         COMPUTING PROCEDURES                         ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; procédure qui lance à chauque tour les calculs dont on a besoins pour les indicateurs du système
 to compute-values
   set unemployement_level count persons with [not employed]
   set vacancy_level count companies with [not job_filled]
@@ -16,6 +17,7 @@ to compute-values
   update-indicators
 end
 
+; procédure de mise à jour de l'indicateur average-job-duration
 to update-average-job-duration
   ask persons with [employed] [
     set job-time ( job-time + 1 )
@@ -29,6 +31,7 @@ to update-average-job-duration
   ]
 end
 
+; procédure de mise à jour de l'indicateur average-unemployement-duration
 to update-average-unemployement-duration
   ask persons with [not employed] [
     set unemployement-time ( unemployement-time + 1 )
@@ -42,6 +45,7 @@ to update-average-unemployement-duration
   ]
 end
 
+; procédure de mise à jour de l'indicateur average-vacant-duration
 to update-average-vacant-duration
   ask companies with [not job_filled] [
     set vacant-time ( vacant-time + 1 )
@@ -52,6 +56,7 @@ to update-average-vacant-duration
   ]
 end
 
+; procédure de mise à jour de l'indicateur market-friction
 to update-market-friction
   let div (min ( list nb_of_pairs_considered vacancy_level unemployement_level) )
   if div != 0 [
@@ -62,51 +67,52 @@ end
 
 ;procédure qui met en mémoire les min(nb-of-step-remembered, ticks) derniers éléments en mémoire dans last-values-unemployement
 to stock-last-values
-  let temp fput unemployement_rate last-values-unemployement ;push to the beginning of the list
+  let temp fput unemployement_rate last-values-unemployement ;on met la nouvelle valeur au début de la liste
   if ticks >= nb-of-step-remembered [
-    set temp but-last temp ;pop last element if list is of size nb-of-step-remembered
+    set temp but-last temp ;si la taille de la liste est plus grande que nb-of-step-remembered on retire la valeur à la fin de la liste
   ]
   set last-values-unemployement temp
   
-  let temp2 fput average-unemployement-duration last-values-indic2 ;push to the beginning of the list
+  let temp2 fput average-unemployement-duration last-values-indic2
   if ticks >= nb-of-step-remembered [
-    set temp2 but-last temp2 ;pop last element if list is of size nb-of-step-remembered
+    set temp2 but-last temp2
   ]
   set last-values-indic2 temp2
   
-  let temp3 fput average-job-duration last-values-indic3 ;push to the beginning of the list
+  let temp3 fput average-job-duration last-values-indic3
   if ticks >= nb-of-step-remembered [
-    set temp3 but-last temp3 ;pop last element if list is of size nb-of-step-remembered
+    set temp3 but-last temp3
   ]
   set last-values-indic3 temp3
   
-  let temp4 fput average-vacant-duration last-values-indic4 ;push to the beginning of the list
+  let temp4 fput average-vacant-duration last-values-indic4
   if ticks >= nb-of-step-remembered [
-    set temp4 but-last temp4 ;pop last element if list is of size nb-of-step-remembered
+    set temp4 but-last temp4
   ]
   set last-values-indic4 temp4
   
-    let temp5 fput friction last-values-indic5 ;push to the beginning of the list
+    let temp5 fput friction last-values-indic5
   if ticks >= nb-of-step-remembered [
-    set temp5 but-last temp5 ;pop last element if list is of size nb-of-step-remembered
+    set temp5 but-last temp5
   ]
   set last-values-indic5 temp5
 end
 
 ; procédure qui surveille la convergence du système et met à jour la valeur du bolléen CONVERGENCE si il y a convergence
-; critère : unemployement-level
+; critère utilisé : unemployement-level
 ; on calcul une moyenne glissante et on regarde si le nouveau résultat est proche ou non
 to update-convergence
   if ticks > nb-of-step-remembered [
     set moving-average mean last-values-unemployement
     
-    if ( abs(moving-average - unemployement_rate) ) < moving-average * (converge-criteria / 100) [
+    if ( abs(moving-average - unemployement_rate) ) < moving-average * (convergence-margin / 100) [
       set convergence TRUE
       type "The market has converged at tick n° :" type ticks type "\n"
     ]
   ] 
 end
 
+; procédure de mise à jour des différents indicateurs rajoutés dans la question 1.4
 to update-indicators
   if ticks > nb-of-step-remembered [
     set indic-2 round mean last-values-indic2
