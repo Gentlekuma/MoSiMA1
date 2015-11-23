@@ -13,7 +13,6 @@ to compute-values
   update-average-job-duration
   update-average-unemployement-duration
   update-average-vacant-duration
-  update-market-friction
   update-indicators
 end
 
@@ -54,15 +53,6 @@ to update-average-vacant-duration
   if vacancy_level != 0 [
     set average-vacant-duration ( vacant-sum / vacancy_level)
   ]
-end
-
-; procédure de mise à jour de l'indicateur market-friction
-to update-market-friction
-  let div (min ( list nb_of_pairs_considered vacancy_level unemployement_level) )
-  if div != 0 [
-      set friction nb-failed-matching / div
-  ]
-  set nb-failed-matching 0
 end
 
 ;procédure qui met en mémoire les min(nb-of-step-remembered, ticks) derniers éléments en mémoire dans last-values-unemployement
