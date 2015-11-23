@@ -5,6 +5,7 @@ __includes[
   "beveridge.nls"
   "matching_procedures_allv.nls" "matching_procedures_v1.nls" "matching_procedures_v2.nls"
   "job_procedures_allv.nls" "job_procedures_v1.nls" "job_procedures_v2.nls"
+  "matching_function.nls"
   ]
 
 globals [
@@ -57,6 +58,10 @@ globals [
   indic-3
   indic-4
   indic-5
+
+  ;variable pour la fonction d'appariement
+  fraction_of_applicants
+
 
   nb-of-step-remembered ; nombre de pas pris en compte dans le calcul de la convergence
   convergence-margin ; marge de mouvements possibles en dessous de laquelle on considère que le système a convergé
@@ -424,7 +429,7 @@ NIL
 PLOT
 493
 334
-1100
+805
 579
 beveridge_curve
 unemployment_rate
@@ -688,7 +693,7 @@ converge-criteria
 converge-criteria
 0
 1
-0.15
+0.05
 0.05
 1
 %
@@ -891,6 +896,42 @@ Version 2 parameters :\n
 0.0
 1
 
+TEXTBOX
+495
+591
+645
+621
+Matching function parameters:
+12
+0.0
+1
+
+SWITCH
+619
+593
+776
+626
+matching_function
+matching_function
+1
+1
+-1000
+
+SLIDER
+798
+595
+1017
+628
+fraction_of_applying_persons
+fraction_of_applying_persons
+0
+1
+0.7
+0.05
+1
+NIL
+HORIZONTAL
+
 @#$#@#$#@
 ## WHAT IS IT?
 Ceci est le programme créé par :
@@ -908,7 +949,6 @@ Dans les paramètres de la simulation, il est possible de choisir la version du 
 -	La version 1 correspond au modèle de base, tel qu'on l'obtient à la fin de la partie 1 du projet.
 -	La version 2 correspond au modèle amélioré, incluant l'ajout de critères d'appariement (question 2.1) et du processus de démission (question 2.3)
 -	La version 3 correspond au modèle amélioré (question 2.4). elle comporte aussi les améliorations de la version 2.
-
 
 @#$#@#$#@
 default
