@@ -8,15 +8,14 @@
 ; on enlève les agents trop vieux, et on rajoute de nouveaux
 to update-agents
   let nb_of_deaths 0
-  ask persons with [age > life_expectancy ] [
+  ask persons with [age >= life_expectancy ] [
     if [employed] of self [
       firing_procedure self [employer] of self
     ]
     set nb_of_deaths nb_of_deaths + 1    
     die
   ]  
-  
-  let nb_of_births round (birth_rate * initial_nb_of_persons)
+  let nb_of_births round (birth_rate * initial_nb_of_persons) + to-randomize 5
    create-persons nb_of_births [
     set color color-person-unemployed
     set size 2
@@ -30,9 +29,14 @@ to update-agents
     set job-time 0
     set unemployement-time 0
     set strong-matching false
-    set-age
+    set age 0
     set-xy
   ]
 
 
+end
+
+; procédure renvoyant un nombre aléatoire compris entre plus ou moins, pour rajouter une part d'aléatoire.
+to-report to-randomize [nb]
+  report random (2 * nb + 1) - nb 
 end
