@@ -438,7 +438,7 @@ NIL
 PLOT
 493
 334
-1013
+1016
 579
 beveridge_curve
 unemployment_rate
@@ -640,7 +640,7 @@ CHOOSER
 version
 version
 1 2 3
-2
+1
 
 SLIDER
 6
@@ -942,50 +942,50 @@ NIL
 HORIZONTAL
 
 TEXTBOX
-1051
-445
-1201
-463
+1068
+307
+1218
+325
 Version 3 parameters :
 12
 0.0
 1
 
 SLIDER
-1059
-478
-1236
-511
+1076
+340
+1253
+373
 age_of_retirement
 age_of_retirement
 40
 100
-70
+60
 5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-1060
-521
-1234
-554
+1077
+383
+1251
+416
 renewal_rate
 renewal_rate
 0
-0.20
-0.05
+0.1
+0.02
 0.01
 1
 NIL
 HORIZONTAL
 
 PLOT
-1060
-242
-1260
-392
+1078
+425
+1278
+575
 nb agents
 NIL
 NIL
