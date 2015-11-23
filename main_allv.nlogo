@@ -45,6 +45,10 @@ globals [
   average-vacant-duration
   nb-failed-matching
   friction
+
+  ; variables pour la convergence
+  convergence
+  last-values-unemployement
   last-values-indic2
   last-values-indic3
   last-values-indic4
@@ -53,12 +57,9 @@ globals [
   indic-3
   indic-4
   indic-5
-  ; variables pour la convergence
-  convergence
-  last-values-unemployement
-  last-values-vacancy
+
   nb-of-step-remembered ; nombre de pas pris en compte dans le calcul de la convergence
-  convergence-margin ; marge de movement possibles en dessous de laquelle on considère que le système a convergé
+  convergence-margin ; marge de mouvements possibles en dessous de laquelle on considère que le système a convergé
 ]
 
 breed [persons person]
@@ -90,6 +91,7 @@ end
 ;;                     RESET TO DEFAULT PARAMETERS                      ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; procédure de réinitilisation de la simulation
 to reset
   reset-globals
   setup
@@ -100,7 +102,7 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; procédure principale, qui se déroule à chaque tour
-; alle s'arrète si on a atteint le timeout ou si le système a convergé.
+; elle s'arrète si on a atteint le timeout ou si le système a convergé.
 to go
 
   if ticks >= timeout or convergence [stop]
@@ -216,9 +218,9 @@ HORIZONTAL
 
 SLIDER
 6
-560
+563
 188
-593
+596
 number_of_pairs_considered
 number_of_pairs_considered
 0
@@ -226,7 +228,7 @@ number_of_pairs_considered
 30
 1
 1
-(percentage of U+V)
+%of (U+V)
 HORIZONTAL
 
 SLIDER
@@ -440,10 +442,10 @@ PENS
 SLIDER
 243
 498
-426
+438
 531
-number_of_field_possibles
-number_of_field_possibles
+number_of_fields_possibles
+number_of_fields_possibles
 1
 10
 5
@@ -686,10 +688,10 @@ converge-criteria
 converge-criteria
 0
 1
-0.05
+0.15
 0.05
 1
-percents
+%
 HORIZONTAL
 
 TEXTBOX
@@ -891,38 +893,23 @@ Version 2 parameters :\n
 
 @#$#@#$#@
 ## WHAT IS IT?
-
-
+Ceci est le programme créé par :
+camille Ostrowski et Claire Rivoire
+pour le projet :
+Modélisation et Simulaion Multi-Agent : Marché du travail simplfié - Courbe de Beveridge.
+Ce projet porte sur un modèle simplifié du marché du travail à base d'agents hétérogènes. Il est fondé sur un article de Z. Lewkovicz, N. Stefanovitch et C. Sommer (2007) "Emergence of the Matching Function in Multi-Agent Based Simulations of the Labor Market", Worskhop LIP6/NII, Novembre 2007.
 ## HOW IT WORKS
 
 
 ## HOW TO USE IT
-
-Parameters:
-
-
-## THINGS TO NOTICE
-
-
-## THINGS TO TRY
+L'interface graphique du projet présente 3 parties : Les paramètres du modèle à gauche, l'écran de simulation et les paramètres de la simulation au centre, et l'affichage des différentes mesures au centre
+Pour la liste des différents paramètres et leur application dans le modèle, se reporter au rapport du projet, partie 1.2.1.
+Dans les paramètres de la simulation, il est possible de choisir la version du modèle que l'on veut appliquer:
+-	La version 1 correspond au modèle de base, tel qu'on l'obtient à la fin de la partie 1 du projet.
+-	La version 2 correspond au modèle amélioré, incluant l'ajout de critères d'appariement (question 2.1) et du processus de démission (question 2.3)
+-	La version 3 correspond au modèle amélioré (question 2.4). elle comporte aussi les améliorations de la version 2.
 
 
-## EXTENDING THE MODEL
-
-
-## NETLOGO FEATURES
-
-
-## RELATED MODELS
-
-
-## CREDITS AND REFERENCES
-
-
-## HOW TO CITE
-
-
-## COPYRIGHT AND LICENSE
 @#$#@#$#@
 default
 true
