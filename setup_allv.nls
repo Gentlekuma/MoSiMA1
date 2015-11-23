@@ -22,6 +22,7 @@ to setup-globals
   set exceptional_motivation_event exceptional_motivation_chances
   set strong_matching_threshold exceptional_matching
   set random_resigning_threshold random_resigning_chances
+  set fraction_of_applicants fraction_of_applying_persons
   
   ; autres variables 
   set timeout 1000
@@ -177,5 +178,6 @@ to reset-globals
   set timeout 1000
   set converge-criteria 0.05
   set unexpected_firing 0.1
+  set fraction_of_applying_persons 0.8
 end
 
