@@ -4,9 +4,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; procédure de génération de la courbe de Beveridge
-; pour tous les point U et V, défnis selon le nombre de points voulus et leur maximum et minimum respectifs, fixés selon l'interface graphique
+; pour tous les points U et V, définis selon le nombre de points voulus et leurs maximums et minimums respectifs (fixés selon l'interface graphique)
 ; pour chaque U et V, on lance une simulation avec Uinitial et Vinitial
-; une fois que celle simulation a convergé, on récupère les valeur de U et V finales et on les trace sur la courbe
+; une fois que cette simulation a convergé, on récupère les valeurs de U et V finales et on les trace sur la courbe
 to generate-simulations-BC
   clear-all
   
@@ -61,7 +61,7 @@ to generate-simulations-BC
   display
 end
 
-; procédure de réinitialisation entre les simulation pour la courbe de Beveridge
+; procédure de réinitialisation entre les simulations pour la courbe de Beveridge
 to setup-simulations [initialU initialV]
 
   clear-turtles

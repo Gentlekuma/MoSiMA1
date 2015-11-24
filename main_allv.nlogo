@@ -86,6 +86,7 @@ companies-own [skills location salary reference_satisfaction job_filled employee
 ;;                       SETUP SINGLE SIMULATION                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; procédure d'initialisation de la simulation
 to setup
   clear-all
 
@@ -501,7 +502,7 @@ TEXTBOX
 187
 1078
 229
-Turns on or off display while computing the Beveridge curve to speed up the process :
+Turns off display while computing the Beveridge curve to speed up the process :
 11
 0.0
 1
@@ -640,7 +641,7 @@ CHOOSER
 version
 version
 1 2 3
-1
+0
 
 SLIDER
 6
@@ -891,7 +892,7 @@ SWITCH
 633
 random_resignation
 random_resignation
-1
+0
 1
 -1000
 
@@ -1015,7 +1016,7 @@ Pour la liste des différents paramètres et leur application dans le modèle, s
 Dans les paramètres de la simulation, il est possible de choisir la version du modèle que l'on veut appliquer:
 -	La version 1 correspond au modèle de base, tel qu'on l'obtient à la fin de la partie 1 du projet.
 -	La version 2 correspond au modèle amélioré, incluant l'ajout de critères d'appariement (question 2.1) et du processus de démission (question 2.3)
--	La version 3 correspond au modèle amélioré (question 2.4). elle comporte aussi les améliorations de la version 2.
+-	La version 3 correspond au modèle amélioré (question 2.4) en système ouvert. elle comporte aussi les améliorations de la version 2.
 @#$#@#$#@
 default
 true

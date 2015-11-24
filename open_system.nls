@@ -4,8 +4,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-; procédure de mise à jours des agents dans le systèmes
-; on enlève les agents trop vieux, et on rajoute de nouveaux
+; procédure de mise à jour des agents dans le système
+; on enlève les agents trop vieux, et on en rajoute de nouveaux
 to update-agents
   let nb_of_deaths 0
   ask persons with [age >= life_expectancy ] [

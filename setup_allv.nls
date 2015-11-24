@@ -109,7 +109,7 @@ to set-random-skills-location-salary
   set salary minimum_salary + random (max_salary - min_salary)
 end
 
-; procédure qui fixe la valeur de référence de la productivité de l'employé au hasard selon une loi normale (pour le pas avoir de valeurs trop extrèmes)
+; procédure qui fixe la valeur de référence de la productivité de l'employé, au hasard selon une loi normale (pour ne pas avoir de valeurs trop extrèmes)
 to set-productivity
   set reference_productivity random-normal 0.7 0.3  
   if reference_productivity < 0 [
@@ -120,7 +120,7 @@ to set-productivity
   ]
 end
 
-; procédure qui fixe la valeur de satisfaction au travail exigée par une personne  selon une loi normale
+; procédure qui fixe la valeur de satisfaction au travail exigée par une personne, au hasard selon une loi normale
 to set-satisfaction-required
   set minimum_satisfaction_required random-normal 0.5 0.3
   if minimum_satisfaction_required < 0 [
@@ -131,7 +131,7 @@ to set-satisfaction-required
   ]
 end
 
-; procédure qui fixe la valeur de référence de la productivité de l'employé au hasard selon une loi normale
+; procédure qui fixe la valeur de référence de la productivité de l'employé, au hasard selon une loi normale
 to set-satisfaction
   set reference_satisfaction random-normal 0.7 0.3
   
@@ -143,12 +143,12 @@ to set-satisfaction
   ]
 end
 
-; procédure qui fixe l'age d'un agents au hasard entre 0 ans et l'age de la retraite
+; procédure qui fixe l'âge d'un agent, au hasard entre 0 et l'âge de la retraite
 to set-age
   set age random life_expectancy
 end
 
-; procédure qui fixe le domaine de l'entreprise
+; procédure qui fixe le domaine de l'entreprise, au hasard entre 0 et nb_of_field_possibles
 to set-random-field
   set field random nb_of_field_possibles
 end
@@ -158,7 +158,7 @@ to set-initial-specialization
   set specialization n-values nb_of_field_possibles [0]
 end
 
-; procédure qui réitilialise des sliders à leur valeurs par défaut
+; procédure qui réitilialise des sliders à leurs valeurs par défaut
 to reset-globals
   set number_of_persons 400
   set number_of_companies 400
@@ -189,6 +189,6 @@ to reset-globals
   set unexpected_firing 0.1
   set fraction_of_applying_persons 0.
   set age_of_retirement 60
-  set renewal_rate 0.05
+  set renewal_rate 0.02
 end
 

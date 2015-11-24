@@ -3,7 +3,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-; procédure qui a chaque tour, décide des productivités des employés et de si ils se font licencier ou non et dans le cas de la version 2 si ils veulent démisionner
+; procédure qui a chaque tour, décide des productivités des employés et de si ils se font licencier ou non et, dans le cas de la version 2, si ils veulent démisionner
 to update-jobs
   ask persons [
     set age age + 1
@@ -36,7 +36,7 @@ to update-jobs
   ]
 end
 
-; fonction qui calcule la productivité d'une personne à chaque tour, basé sur sa productivité de référence
+; fonction qui calcule la productivité d'une personne à chaque tour, basée sur sa productivité de référence
 to-report compute-productivity   
 
   let temp reference_productivity + (random-float (2) - 1) * max_productivity_fluctuation * reference_productivity
@@ -51,6 +51,7 @@ end
 
 
 ; fonction qui calcule la pstatisfaction d'un job à chaque tour, basé sur sa productivité de référence
+; renvoie une valeur entre 0 et 1
 to-report compute-satisfaction [company]  
   let reference_value [reference_satisfaction] of company
   let temp reference_value + (random-float (2) - 1) * max_satisfaction_fluctuation * reference_value

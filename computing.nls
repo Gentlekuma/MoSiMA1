@@ -2,7 +2,7 @@
 ;;                         COMPUTING PROCEDURES                         ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-; procédure qui lance à chauque tour les calculs dont on a besoins pour les indicateurs du système
+; procédure qui lance à chaque tour les calculs dont on a besoin pour les indicateurs du système
 to compute-values
   set unemployement_level count persons with [not employed]
   set vacancy_level count companies with [not job_filled]
@@ -56,7 +56,7 @@ to update-average-vacant-duration
   ]
 end
 
-;procédure qui met en mémoire les min(nb-of-step-remembered, ticks) derniers éléments en mémoire dans last-values-unemployement
+;procédure qui met les min(nb-of-step-remembered, ticks) derniers éléments en mémoire dans last-values pour chaque indicateur
 to stock-last-values
   let temp fput unemployement_rate last-values-unemployement ;on met la nouvelle valeur au début de la liste
   if ticks >= nb-of-step-remembered [
@@ -91,7 +91,7 @@ end
 
 ; procédure qui surveille la convergence du système et met à jour la valeur du bolléen CONVERGENCE si il y a convergence
 ; critère utilisé : unemployement-level
-; on calcul une moyenne glissante et on regarde si le nouveau résultat est proche ou non
+; on calcule une moyenne glissante et on regarde si le nouveau résultat est proche ou non
 to update-convergence
   if ticks > nb-of-step-remembered [
     set moving-average mean last-values-unemployement

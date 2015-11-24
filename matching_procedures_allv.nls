@@ -3,7 +3,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-; procédure qui a chaque tour, lance la procédure d'appariement en fonction de la version voulue
+; procédure qui à chaque tour, lance la procédure d'appariement en fonction de la version voulue
 to agents-matching
   ifelse matching_function [
     agents-matching_with_matching_function
@@ -21,7 +21,7 @@ to agents-matching
 end
 
 
-; fonction qui calcule la similarité entre les compétences attendus par l'entreprise et celles possédées par le candidat
+; fonction qui calcule la similarité entre les compétences attendues par l'entreprise et celles possédées par le candidat
 ; renvoie un nombre entre 0 et 1
 ; elle renvoie le même résultat pour les agents PERSON et les agents COMPANY
 to-report compute-similarity_skills [skills1 skills2]
@@ -47,7 +47,7 @@ end
 ; fonction qui retourne la similarité entre les salaires
 ; renvoie un nombre entre 0 et 1
 ; elle renvoie le même résultat pour les agents PERSON et les agents COMPANY
-; on veut que les salaires soient le plus proche possible : si le salaire proposé est trop élevé par rapport aux attentes de l'employé, c'est mauvais pour la similarité de celui-ci
+; on veut que les salaires soient le plus proches possible : si le salaire proposé est trop élevé par rapport aux attentes de l'employé, c'est mauvais pour la similarité de celui-ci
 to-report compute-similarity_salary [salary1 salary2]
   let max_value max List salary1 salary2
   let min_value min List salary1 salary2

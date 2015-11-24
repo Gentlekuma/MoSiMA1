@@ -93,7 +93,7 @@ end
 ; fonction qui retourne la similarité entre le domaine d'activité de l'entreprise et la spécialisation de l'employé
 ; renvoie un nombre entre 0 et 1
 ; elle renvoie le même résultat pour les agents PERSON et les agents COMPANY
-; si l'employé n'a aucune spécialisation, la valeur retourné est 1. sinon, la valeur retournée est le pourcentage de toutes ses spécialisations
+; si l'employé n'a aucune spécialisation, la valeur retournée est 1. sinon, la valeur retournée est le pourcentage de toutes ses spécialisations
 to-report compute-similarity_field [field_of_company specialization_of_person]
   ifelse sum specialization_of_person = 0 [    
     report 1

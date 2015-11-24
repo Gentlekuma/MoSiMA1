@@ -1,5 +1,4 @@
 ; procédure d'affichage des différentes LOCATION sur le fond de l'écran de modélisation, par des bandes horizontales
-; TODO peut-être l'améliorer, ça pose problème avec un grand nombre de zones
 to setup-patches
   ask patches [
     let size-of-zones round ( (2 * max-pycor + 1) / nb_of_locations_possibles )
@@ -10,7 +9,7 @@ to setup-patches
 end
 
 
-; procédure que dispose les agents (PERSON et COMPANY) en fonction de leur attribut LOCATION
+; procédure qui dispose les agents (PERSON et COMPANY) en fonction de leur attribut LOCATION
 ; on considère les différents lieux comme des bandes horizontales sur la zone d'affichage
 to set-xy
   let x random-pxcor

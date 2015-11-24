@@ -24,7 +24,7 @@ to hiring_procedure_v2 [person company similarity]
 end
 
 
-; procedure qui met à jour l'attirbut specilization d'un employé lorsque celui-ci trouve un travail dans un certain domaine
+; procedure qui met à jour l'attribut SPECIALIZATION d'un employé lorsque celui-ci trouve un travail dans un certain domaine
 to update-specialization_v2
   let field_of_company [field] of employer 
   let old_specilization_value item field_of_company specialization 
